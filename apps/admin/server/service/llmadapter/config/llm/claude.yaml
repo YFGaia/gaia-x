@@ -1,0 +1,55 @@
+# Anthropic Claude API配置文件
+# 包含开发和生产环境的多组API密钥配置
+
+environments:
+  # 开发环境配置
+  development:
+    credentials:
+      # Claude开发测试配置组1
+      - name: "dev_claude1"
+        api_key: "YOUR_API_KEY_HERE"                # API密钥
+        enabled: true                             # 是否启用该配置
+        weight: 50                                # 负载均衡权重
+        qps_limit: 10                             # 每秒请求限制
+        description: "Claude开发测试账号1"         # 配置说明
+        models:                                   # 支持的模型列表
+          - "claude-2.1"
+          - "claude-instant-1.2"
+        base_url: "https://api.anthropic.com/v1"  # API基础地址
+        timeout: 30                               # 请求超时时间（秒）
+        
+      # Claude开发测试配置组2
+      - name: "dev_claude2"
+        api_key: "YOUR_API_KEY_HERE"
+        enabled: true
+        weight: 50
+        qps_limit: 10
+        description: "Claude开发测试账号2"
+        models:
+          - "claude-2.1"
+          - "claude-instant-1.2"
+        
+  # 生产环境配置
+  production:
+    credentials:
+      # Claude生产主要配置组
+      - name: "prod_claude_primary"
+        api_key: "YOUR_API_KEY_HERE"
+        enabled: true
+        weight: 60
+        qps_limit: 50
+        description: "Claude生产主账号"
+        models:
+          - "claude-2.1"
+          - "claude-3-opus-20240229"
+        
+      # Claude生产备用配置组
+      - name: "prod_claude_backup"
+        api_key: "YOUR_API_KEY_HERE"
+        enabled: true
+        weight: 40
+        qps_limit: 30
+        description: "Claude生产备用账号"
+        models:
+          - "claude-2.1"
+          - "claude-3-sonnet-20240229" 

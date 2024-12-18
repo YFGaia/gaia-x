@@ -1,0 +1,22 @@
+@media (prefers-color-scheme: dark) {
+    .button {
+        color: #9D9D9D !important;
+        border-radius: 0 !important;
+    }
+    .button:hover {
+        background-color: #3D3D3D !important;
+    }
+    .button:focus {
+        background-color: #7F7F7E !important;
+        outline: none !important;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .button {
+        border-radius: 0 !important;
+    }
+    .button:hover {
+        background-color: #F2F2F2 !important;
+    }
+}

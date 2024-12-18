@@ -1,0 +1,40 @@
+html.light {
+  color-scheme: light;
+
+  /* 基础色 */
+  --gxk-color-primary: #ffffff;
+  --gxk-color-secondary: #dcdcdc;
+  --gxk-color-tertiary: #cdcdcd;
+  
+  /* 文本色 */
+  --gxk-text-color-primary: #000000;
+  --gxk-text-color-secondary: #343434;
+  --gxk-text-color-tertiary: #8b8b8b;
+  --gxk-text-color-disabled: #D5D5D5;
+  
+  /* 背景色 */
+  --gxk-bg-color-0: #f9f9f9;
+  --gxk-bg-color-primary: #F7F7F7;
+  --gxk-bg-color-secondary: #ededed;
+  --gxk-bg-color-tertiary: #ececec;
+  --gxk-bg-color-hover: #dddddd;
+  --gxk-bg-color-active: #b9b9b9;
+  --gxk-bg-color-alpha: #F7F7F7aa;
+  
+  /* 边框色 */
+  --gxk-border-color-primary: #cdcdcd;
+  --gxk-border-color-secondary: #cbcbcb;
+  
+  /* 图标色 */
+  --gxk-icon-color-primary: #444;
+  --gxk-icon-color-secondary: #5a5a5a;
+  
+  /* 特殊色 */
+  --gxk-color-shadow: #8a8a8afc;
+  --gxk-color-alpha: rgba(255, 255, 255, 0.5);
+  --gxk-color-text-alpha: rgba(0, 0, 0, 0.5);
+  --gxk-color-ex1: #1d939b;
+  --gxk-color-ex2: #25a1aa;
+  --error-color: #dd5f5f;
+}
+

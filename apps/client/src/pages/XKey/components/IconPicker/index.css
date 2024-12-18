@@ -1,0 +1,108 @@
+.icon-picker {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1rem;
+}
+
+.search-container {
+  padding: 0 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--gxk-border-color-primary);
+  border-radius: 4px;
+  background: var(--gxk-bg-color-primary);
+  color: var(--gxk-text-color-primary);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--gxk-color-ex1);
+}
+
+.icon-grid-container {
+  height: 400px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-item:hover {
+  background: var(--gxk-bg-color-hover);
+}
+
+.icon-item.selected {
+  background: var(--gxk-bg-color-active);
+  color: var(--gxk-color-ex1);
+}
+
+.icon-display {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-name {
+  font-size: 12px;
+  margin-top: 4px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Button styles matching PresetModal */
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button.primary {
+  background: var(--gxk-color-ex1);
+  color: white;
+}
+
+.button.primary:hover {
+  background: var(--gxk-bg-color-active);
+}
+
+.button.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button.secondary {
+  background: var(--gxk-bg-color-secondary);
+  color: var(--gxk-text-color-primary);
+}
+
+.button.secondary:hover {
+  background: var(--gxk-bg-color-hover);
+}

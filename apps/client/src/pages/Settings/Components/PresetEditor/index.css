@@ -1,0 +1,118 @@
+.preset-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.preset-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--gxk-border-color-secondary);
+}
+
+.preset-list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  border-radius: 4px;
+}
+
+/* Add custom scrollbar styling */
+.preset-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preset-list::-webkit-scrollbar-track {
+  background: var(--gxk-bg-color-secondary);
+}
+
+.preset-list::-webkit-scrollbar-thumb {
+  background: var(--gxk-border-color-secondary);
+  border-radius: 4px;
+}
+
+.preset-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gxk-border-color-primary);
+}
+
+.preset-list.dragging-over {
+  background: var(--bg-hover);
+}
+
+.preset-list-item.dragging {
+  background: var(--bg-active);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.preset-list-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gxk-border-color-primary);
+}
+
+.preset-list-pagination button {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--gxk-border-color-primary);
+  border-radius: 4px;
+  background: var(--gxk-bg-color-primary);
+  cursor: pointer;
+}
+
+.preset-list-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preset-list-pagination button:not(:disabled):hover {
+  background: var(--gxk-bg-color-hover);
+}
+
+/* Modal样式 */
+.preset-editor-modal .preset-modal-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+  height: 100%;
+  max-height: calc(80vh - 110px); /* 减去header和footer的高度 */
+}
+
+/* Scrollbar styles */
+.preset-editor-modal .preset-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preset-editor-modal .preset-modal-content::-webkit-scrollbar-track {
+  background: var(--gxk-bg-color-primary);
+}
+
+.preset-editor-modal .preset-modal-content::-webkit-scrollbar-thumb {
+  background: var(--gxk-border-color-primary);
+  border-radius: 4px;
+}
+
+.preset-editor-modal .preset-modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--gxk-text-color-secondary);
+}
+
+/* 确保滚动条始终存在，防止布局抖动 */
+.preset-editor-modal .preset-modal-content {
+  overflow-y: scroll;
+}
+
+/* 表单样式 */
+.preset-editor-modal .preset-modal-content form {
+  padding: 16px;
+  width: 100%;
+} 

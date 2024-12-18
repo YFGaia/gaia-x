@@ -1,0 +1,210 @@
+.preset-modal-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+label {
+  min-width: 100px;
+  font-weight: 500;
+  color: var(--gxk-text-color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  flex: 1;
+}
+
+input, select, textarea {
+  padding: 0.5rem;
+  border: 1px solid var(--gxk-border-color-primary);
+  border-radius: 4px;
+  background: var(--gxk-bg-color-primary);
+  color: var(--gxk-text-color-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--gxk-color-ex1);
+}
+
+input.error, select.error, textarea.error {
+  border-color: var(--error-color);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-left: 120px;
+  /* margin-top: 0.25rem; */
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: sans-serif;
+}
+
+.icon-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--gxk-border-color-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 34px;
+}
+
+.icon-selector:hover {
+  background: var(--gxk-bg-color-hover);
+}
+
+.selected-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: var(--gxk-text-color-primary);
+}
+
+.icon-name {
+  flex: 1;
+  color: var(--gxk-text-color-secondary);
+}
+
+.edit-icon {
+  color: var(--gxk-text-color-secondary);
+  margin-left: auto;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gxk-border-color-primary);
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button.primary {
+  background: var(--gxk-color-ex1);
+  color: var(--gxk-text-color-primary);
+}
+
+.button.primary:hover {
+  background: var(--gxk-bg-color-active);
+}
+
+.button.secondary {
+  background: var(--gxk-bg-color-secondary);
+  color: var(--gxk-text-color-primary);
+}
+
+.button.secondary:hover {
+  background: var(--gxk-bg-color-hover);
+}
+
+/* Scrollbar styles */
+.preset-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preset-modal-content::-webkit-scrollbar-track {
+  background: var(--gxk-bg-color-primary);
+}
+
+.preset-modal-content::-webkit-scrollbar-thumb {
+  background: var(--gxk-border-color-primary);
+  border-radius: 4px;
+}
+
+.preset-modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--gxk-text-color-secondary);
+}
+
+.url-provider-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.url-provider-group .form-group {
+  margin-top: 0;
+}
+
+.url-provider-group .url-input {
+  flex: 2;
+}
+
+.url-provider-group .provider-select {
+  flex: 1;
+} 
+
+.provider-select select {
+  cursor: pointer;
+}
+
+.flex-4 {
+  flex: 4 !important;
+}
+
+.title-icon-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.title-icon-group .form-group {
+  margin-bottom: 0;
+}
+
+.title-icon-group .title-input {
+  flex: 4;
+}
+
+.title-icon-group .icon-select {
+  flex: 1;
+}
+
+.password-toggle {
+  cursor: pointer;
+  margin-left: auto;
+}

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gaia-x-web
+  annotations:
+    YFGaia/gaia-x: ui
+    github: "https://github.com/YFGaia/gaia-x.git"
+    app.kubernetes.io/version: 0.0.1
+  labels:
+    app: gaia-x-web
+    version: gaia-x-vue3
+spec:
+#  type: NodePort
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: gaia-x-web
+    version: gaia-x-vue3

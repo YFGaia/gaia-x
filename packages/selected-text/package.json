@@ -1,0 +1,25 @@
+{
+  "name": "@gaia-x-key/selected-text",
+  "version": "0.0.1",
+  "description": "get text selection anywhere",
+  "main": "index.js",
+  "scripts": {
+    "start": "node example.js",
+    "install": "node-gyp-build",
+    "rebuild": "npm run install --build-from-source",
+    "install2": "node-gyp rebuild"
+  },
+  "keywords": [
+    "node-gyp"
+  ],
+  "author": "gaiabot.ai",
+  "license": "ISC",
+  "gypfile": true,
+  "dependencies": {
+    "node-addon-api": "^8.3.0",
+    "node-gyp-build": "^4.8.4",
+    "@gaia-x-key/key-mouse-listener": "workspace:*"
+  },
+  "devDependencies":{
+  }
+}

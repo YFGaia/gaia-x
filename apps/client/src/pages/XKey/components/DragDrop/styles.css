@@ -1,0 +1,103 @@
+/* Base styles for draggable items */
+.draggable {
+  cursor: move;
+  user-select: none;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Style when item is being dragged */
+.draggable.dragging {
+  opacity: 0.9;
+  transform: scale(1.02) rotate(0.5deg);
+  z-index: 100;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  animation: pickup 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Drop target styles */
+.drop-target {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Style when dragging over a drop target */
+.drop-target.is-over {
+  background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.05));
+  transform: scale(1.01);
+}
+
+/* Drop indicator line with animation */
+.drop-target.is-over::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background-color: var(--primary-color, #0052cc);
+  bottom: 0;
+  transform-origin: center;
+  animation: dropIndicator 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Optional: Drag handle */
+.drag-handle {
+  cursor: move;
+  opacity: 0.5;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.draggable:hover .drag-handle {
+  opacity: 1;
+}
+
+/* Animation when picking up an item */
+@keyframes pickup {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.04) rotate(1deg);
+  }
+  100% {
+    transform: scale(1.02) rotate(0.5deg);
+  }
+}
+
+/* Animation for drop indicator */
+@keyframes dropIndicator {
+  0% {
+    opacity: 0.4;
+    transform: scaleX(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scaleX(0.95);
+  }
+}
+
+/* Animation when dropping an item */
+.draggable:not(.dragging) {
+  animation: dropBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes dropBounce {
+  0% {
+    transform: scale(1.02) rotate(0.5deg);
+  }
+  50% {
+    transform: scale(0.98) rotate(-0.2deg);
+  }
+  75% {
+    transform: scale(1.01) rotate(0.1deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+} 

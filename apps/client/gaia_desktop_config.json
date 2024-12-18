@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "git": {
+      "type": "normal",
+      "transport": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_server_git"
+      ]
+    },
+    "remote_computer_use": {
+      "type": "remote",
+      "transport": "sse",
+      "url": "http://192.168.174.43:3001/sse"
+    },
+    "remote_image_chat": {
+      "type": "normal",
+      "transport": "sse",
+      "url": "http://192.168.174.43:3002/sse"
+    }
+  }
+}

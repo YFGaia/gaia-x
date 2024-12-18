@@ -1,0 +1,112 @@
+{
+  "name": "gaia-x",
+  "productName": "Gaia-X",
+  "version": "0.0.1",
+  "main": "dist-electron/main/index.js",
+  "description": "A Supper App Gaia-X",
+  "author": "famousmai <906631095@qq.com>",
+  "license": "MIT",
+  "private": true,
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:debug": "vite -- --debug2=xxx",
+    "build": "tsc && vite build && set DEBUG=electron-builder && electron-builder --config electron-builder.json --publish always",
+    "build:mac": "tsc && vite build && electron-builder --mac --config electron-builder.json --publish always",
+    "build:win": "tsc && vite build && electron-builder --win --config electron-builder.json --publish always",
+    "create-migration": "node scripts/create-migration.js",
+    "postinstall": "pnpm run rebuild",
+    "preview": "vite preview",
+    "pretest": "vite build --mode=test",
+    "rebuild": "electron-rebuild -w && electron-rebuild -w -f better-sqlite3",
+    "test": "vitest run",
+    "msw:init": "msw init public/",
+    "ele-bud": " set DEBUG=electron-builder &&  electron-builder --win --publish never",
+    "build:config": "set DEBUG=electron-builder && electron-builder --config electron-builder.json --win --mac --publish always"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@ant-design/x": "^1.0.5",
+    "@azure/identity": "^4.5.0",
+    "@gaia-x-key/key-mouse-listener": "workspace:*",
+    "@gaia-x-key/selected-text": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.1.0",
+    "@types/adm-zip": "^0.5.7",
+    "@types/event-source-polyfill": "^1.0.5",
+    "@types/eventsource": "^1.1.15",
+    "adm-zip": "^0.5.16",
+    "antd": "^5.23.3",
+    "antd-style": "^3.7.1",
+    "axios": "^1.7.9",
+    "better-sqlite3": "^11.8.1",
+    "dayjs": "^1.11.13",
+    "electron-dl": "^4.0.0",
+    "electron-updater": "^6.3.9",
+    "event-source-polyfill": "^1.0.31",
+    "eventsource": "^3.0.2",
+    "markdown-it": "^14.1.0",
+    "motion": "^12.4.3",
+    "nanoid": "^5.0.9",
+    "openai": "^4.77.0",
+    "prismjs": "^1.29.0",
+    "react-icons": "^5.4.0",
+    "react-markdown": "^9.0.1",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.0",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.1",
+    "@playwright/test": "^1.48.2",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.10.5",
+    "@types/prismjs": "^1.26.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8",
+    "electron-log": "^5.3.2",
+    "msw": "^2.7.0",
+    "postcss": "^8.4.49",
+    "postcss-import": "^16.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.4.2",
+    "vite": "^5.4.11",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vitest": "^2.1.5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  },
+  "build": {
+    "generateUpdatesFilesForAllChannels": true,
+    "protocols": [
+      {
+        "name": "Gaia-X",
+        "schemes": [
+          "gaia-x"
+        ],
+        "role": "Editor"
+      }
+    ],
+    "win": {
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
+    }
+  }
+}

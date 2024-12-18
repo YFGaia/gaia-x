@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 启动后端命令
+cd apps/admin/server
+go mod tidy
+go run main.go
+
+# 启动前端命令
+cd apps/admin/web
+npm install
+npm run serve

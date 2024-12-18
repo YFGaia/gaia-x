@@ -1,0 +1,49 @@
+# DeepSeek 模型配置示例文件
+# 将此文件重命名为 deepseek.yaml 并适当修改配置参数
+
+environments:
+  # 开发环境配置
+  development:
+    credentials:
+      - name: "deepseek-dev"
+        api_key: "YOUR_API_KEY_HERE"  # 您的DeepSeek API密钥
+        base_url: "https://api.deepseek.com/"  # API基础URL（可选）
+        enabled: true  # 是否启用此配置
+        weight: 100  # 权重（用于多配置随机选择）
+        qps_limit: 3  # 每秒请求限制（可选）
+        description: "DeepSeek开发环境配置"  # 配置描述
+        models:  # 支持的模型列表
+          - "deepseek-coder"
+          - "deepseek-reasoner"
+          - "deepseek-chat"
+        timeout: 120  # 超时设置（秒）
+        proxy: ""  # 代理设置（可选）
+
+  # 生产环境配置
+  production:
+    credentials:
+      - name: "deepseek-prod-1"
+        api_key: "YOUR_API_KEY_HERE"
+        base_url: "https://api.deepseek.com/"
+        enabled: true
+        weight: 70
+        qps_limit: 10
+        description: "DeepSeek生产环境配置1"
+        models:
+          - "deepseek-coder"
+          - "deepseek-reasoner"
+        timeout: 60
+        proxy: ""
+
+      - name: "deepseek-prod-2"
+        api_key: "YOUR_API_KEY_HERE"
+        base_url: "https://api.deepseek.com"
+        enabled: true
+        weight: 30
+        qps_limit: 5
+        description: "DeepSeek生产环境配置2"
+        models:
+          - "deepseek-coder"
+          - "deepseek-reasoner"
+        timeout: 60
+        proxy: "" 

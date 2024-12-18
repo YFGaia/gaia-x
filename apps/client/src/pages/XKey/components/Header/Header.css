@@ -1,0 +1,41 @@
+.header {
+  /** 配置窗口可拖拽*/
+  -webkit-app-region: drag;
+  height: 39px;
+  box-shadow: 1px 1px 4px -1px var(--gxk-color-shadow);
+  z-index: 1000;
+  background-color: var(--gxk-bg-color-alpha);
+  /* margin-top: 5px; */
+}
+.content-bar {
+  padding: 8px 15px 8px 10px;
+  line-height: 1em;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+
+.content-bar .btn {
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  user-select: none;
+  line-height: 1em;
+  padding: 3px 5px;
+}
+
+.content-bar .btn .icon {
+  height: 18px;
+  font-weight: 600;
+}
+.content-bar .btn:hover {
+  background: var(--gxk-bg-color-hover);
+  border-radius: 5px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}

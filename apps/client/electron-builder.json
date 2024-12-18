@@ -1,0 +1,56 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.gaiabot.ai.gaia-x",
+  "productName": "Gaia-X",
+  "asar": true,
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": [
+    "dist-electron",
+    "dist",
+    "gaia_desktop_config.json"
+  ],
+  "extraResources": [
+    {
+      "from": "./migrations",
+      "to": "migrations",
+      "filter": ["**/*.sql"]
+    },
+    {
+      "from": "./src/assets/favicon-mac.png",
+      "to": "extraResources/favicon-mac.png"
+    }
+  ],
+  "mac": {
+    "artifactName": "${productName}_${version}_${arch}.${ext}",
+    "target": [
+      "dmg"
+    ],
+    "category": "public.app-category.developer-tools"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "artifactName": "${productName}_${version}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
+  },
+  "publish": {
+    "provider": "generic",
+    "channel": "latest",
+    "url": "http://wu.update.local/latest/",
+    "publishAutoUpdate": true,
+    "useMultipleRangeRequest": false
+  }
+}

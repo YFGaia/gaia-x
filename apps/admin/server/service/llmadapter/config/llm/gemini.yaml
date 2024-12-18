@@ -1,0 +1,93 @@
+# Gemini API 配置文件
+# 该文件定义了不同环境下的 Gemini 服务凭证和参数配置
+
+environments:
+  # 开发环境配置
+  development:
+    credentials:
+      # 第一个凭证配置
+      - name: "gemini-pro"  # 配置名称
+        api_key: "YOUR_API_KEY_HERE"  # 加密后的 API 密钥，会通过 RSA 进行解密
+        api_endpoint: ""  # 可选，自定义 API 端点，留空使用默认端点
+        enabled: true  # 是否启用该配置
+        weight: 10  # 权重，用于多配置随机选择
+        qps_limit: 60  # 每秒请求限制
+        description: "Gemini Pro 模型"  # 描述信息
+        models:  # 支持的模型列表
+          - "gemini-pro"
+          - "gemini-pro-vision"
+        timeout: 30  # 请求超时时间（秒）
+        proxy: ""  # 代理设置，格式如 "http://proxy.example.com:8080"
+        safety_settings:  # 安全设置
+          harassment: "medium"  # 骚扰内容过滤等级: none, low, medium, high
+          hate_speech: "medium"  # 仇恨言论过滤等级
+          sexually_explicit: "high"  # 色情内容过滤等级
+          dangerous_content: "medium"  # 危险内容过滤等级
+        generation_config:  # 生成配置
+          candidate_count: 1  # 生成候选回答数量
+          stop_sequences: []  # 停止序列，遇到这些序列时停止生成
+        enable_code_execution: false  # 是否允许模型执行代码（存在安全风险）
+
+      # 第二个凭证配置示例（未启用）
+      - name: "gemini-pro-1.5"
+        api_key: "YOUR_API_KEY_HERE"
+        enabled: false  # 未启用
+        weight: 5
+        qps_limit: 40
+        description: "Gemini 1.5 Pro 模型"
+        models:
+          - "gemini-1.5-pro"
+          - "gemini-1.5-flash"
+        timeout: 60
+        proxy: ""
+        safety_settings:
+          harassment: "medium"
+          hate_speech: "medium"
+          sexually_explicit: "high"
+          dangerous_content: "medium"
+        enable_code_execution: false
+
+  # 生产环境配置
+  production:
+    credentials:
+      - name: "gemini-prod"
+        api_key: "YOUR_API_KEY_HERE"
+        api_endpoint: ""
+        enabled: true
+        weight: 100
+        qps_limit: 100
+        description: "生产环境 Gemini 模型"
+        models:
+          - "gemini-pro"
+          - "gemini-1.5-pro"
+        timeout: 30
+        proxy: ""
+        safety_settings:
+          harassment: "high"
+          hate_speech: "high"
+          sexually_explicit: "high"
+          dangerous_content: "high"
+        generation_config:
+          candidate_count: 1
+        enable_code_execution: false
+
+  # 测试环境配置
+  testing:
+    credentials:
+      - name: "gemini-test"
+        api_key: "YOUR_API_KEY_HERE"
+        api_endpoint: ""
+        enabled: true
+        weight: 100
+        qps_limit: 20
+        description: "测试环境 Gemini 模型"
+        models:
+          - "gemini-pro"
+        timeout: 60
+        proxy: ""
+        safety_settings:
+          harassment: "low"
+          hate_speech: "low"
+          sexually_explicit: "medium"
+          dangerous_content: "medium"
+        enable_code_execution: true  # 测试环境允许代码执行

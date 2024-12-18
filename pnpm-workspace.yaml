@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - '!**/node_modules'
+  
+shared-workspace-lockfile: true

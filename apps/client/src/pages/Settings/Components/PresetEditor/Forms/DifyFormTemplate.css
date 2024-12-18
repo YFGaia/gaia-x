@@ -1,0 +1,127 @@
+.dify-form-container {
+  width: 100%;
+  margin-top: 1rem;
+  font-size: 14px;
+}
+
+.dify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--gxk-border-color-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.dify-form-header {
+  display: flex;
+  background-color: var(--bg-secondary);
+  padding: 12px;
+  border-bottom: 1px solid var(--gxk-border-color-primary);
+}
+
+.dify-form-row {
+  display: flex;
+  padding: 6px;
+  border-bottom: 1px solid var(--gxk-border-color-primary);
+}
+
+.dify-form-row:last-child {
+  border-bottom: none;
+}
+
+.column {
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+
+.column-name {
+  flex: 2;
+  min-width: 120px;
+}
+
+.column-type {
+  flex: 1;
+  min-width: 100px;
+}
+
+.column-default {
+  flex: 2;
+  min-width: 120px;
+}
+
+.column-selection {
+  flex: 0 0 80px;
+  justify-content: center;
+}
+
+.required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+.field-options {
+  color: var(--gxk-text-color-secondary);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* 确保默认值输入框样式与整体设计一致 */
+.column-default .ant-input {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.column-default .ant-input:hover {
+  border-color: var(--gxk-border-color-primary);
+}
+
+.column-default .ant-input:focus {
+  border-color: var(--gxk-border-color-primary);
+  box-shadow: 0 0 0 2px var(--gxk-border-color-primary);
+}
+
+.editable-field {
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.editable-field:hover {
+  border-color: var(--gxk-border-color-primary);
+  background-color: var(--gxk-background-color-secondary);
+}
+
+/* Radio样式优化 */
+.dify-form .ant-radio {
+  transform: scale(1.2);
+}
+
+.dify-form .ant-radio-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.dify-form .ant-radio-wrapper:hover .ant-radio {
+  border-color: #1890ff;
+}
+
+.dify-form .ant-radio-checked::after {
+  border: 1px solid #1890ff;
+}
+
+.dify-form .ant-radio-inner {
+  background-color: transparent;
+}
+
+.dify-form .ant-radio-checked .ant-radio-inner {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+
+

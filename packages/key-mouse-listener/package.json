@@ -1,0 +1,50 @@
+{
+  "name": "@gaia-x-key/key-mouse-listener",
+  "version": "1.2.0",
+  "description": "Global mouse events listener for Node.js (Windows only)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node example.js",
+    "rebuild": "node-gyp rebuild",
+    "install": "npm run rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xanderfrangos/global-mouse-events.git"
+  },
+  "keywords": [
+    "mouse-hooks",
+    "windows",
+    "mouse-events",
+    "mouse",
+    "windows-hooks",
+    "hooks",
+    "global",
+    "node"
+  ],
+  "author": "xanderfrangos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xanderfrangos/global-mouse-events/issues"
+  },
+  "homepage": "https://github.com/xanderfrangos/global-mouse-events#readme",
+  "dependencies": {
+    "bindings": "1.5.0",
+    "node-addon-api": "^7.0.0",
+    "node-gyp": "^10.0.1"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "thread.js",
+    "binding.gyp",
+    "global-mouse-events.cc",
+    "LICENSE",
+    "example.js",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/node": "^14.14.32",
+    "typescript": "^4.2.3"
+  }
+}

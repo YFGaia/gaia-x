@@ -1,0 +1,14 @@
+{
+  "name": "node-example",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "gaia-x-key": "file:.."
+  },
+  "devDependencies":{
+    "@gaia-x-key/key-mouse-listener": "file:../key-mouse-listener"
+  }
+}

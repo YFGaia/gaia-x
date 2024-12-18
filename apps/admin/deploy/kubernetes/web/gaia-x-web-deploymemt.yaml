@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gaia-x-web
+  annotations:
+    YFGaia/gaia-x: ui
+    github: "https://github.com/YFGaia/gaia-x.git"
+    app.kubernetes.io/version: 0.0.1
+  labels:
+    app: gaia-x-web
+    version: gaia-x-vue3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gaia-x-web
+      version: gaia-x-vue3
+  template:
+    metadata:
+      labels:
+        app: gaia-x-web
+        version: gaia-x-vue3
+    spec:
+      containers:
+        - name: gaia-x-web-nginx-container
+          image: /dev/gaia-x/web:latest # TODO: 需要加上镜像地址
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1000Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/
+              name: nginx-config
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: my.conf
