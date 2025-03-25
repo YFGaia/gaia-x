@@ -163,7 +163,7 @@ const ResizablePanels: React.FC<Props> = ({
 
       {leftVisible && (
         <div
-          className={`w-1 h-full cursor-col-resize bg-gray-200 hover:bg-blue-400 active:bg-blue-600 ${
+          className={`w-1 h-full cursor-col-resize bg-gray-200 dark:bg-zinc-800 hover:bg-blue-400 active:bg-blue-600 ${
             isDragging === "left" ? "bg-blue-600" : ""
           }`}
           onMouseDown={(e) => handleMouseDown(e, "left")}

@@ -12,8 +12,8 @@ const { Header: AntHeader, Content } = AntLayout;
 const Layout: React.FC = () => {
   const { leftPanel, rightPanel, mode } = useAppStateStore();
   return (
-    <AntLayout className="h-screen w-screen bg-white">
-      <AntHeader className="bg-white border-0 dark:bg-[#1F1F1F] border-b h-[34px] px-0 border-solid border-b-gray-200">
+    <AntLayout className="h-screen w-screen">
+      <AntHeader className="border-0 bg-white dark:bg-[#1F1F1F] border-b h-[34px] px-0 border-solid border-b-gray-200 dark:border-b-gray-800">
         <Header />
       </AntHeader>
       <Content className="app-region-no-drag">

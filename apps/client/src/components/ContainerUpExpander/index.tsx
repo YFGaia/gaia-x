@@ -155,7 +155,7 @@ const ContainerUpExpander: React.FC<ContainerUpExpanderProps> = ({
           onClick={handleToggle}
           style={{
             padding: '12px 16px',
-            background: '#fafafa',
+            // background: '#fafafa',
             border: '1px solid #f0f0f0',
             borderRadius: expanded ? '0 0 8px 8px' : '8px',
             display: 'flex',

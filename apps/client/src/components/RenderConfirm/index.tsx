@@ -69,7 +69,7 @@ export const RenderConfirmView: React.FC<RenderConfirm> = (props: RenderConfirm)
         </div>
       ),
       children: [
-        <div className="rounded-lg bg-[#FAFAFA] my-4 p-2" key={props.item.id}>
+        <div className="rounded-lg my-4 p-2" key={props.item.id}>
           {props.item.type === 'markdown' && <Markdown content={props.item.content} />}
           {props.item.type === 'call' && <Markdown content={props.item.content} />}
           {props.item.type === 'html' && <Html html={props.item.content} />}
@@ -79,13 +79,12 @@ export const RenderConfirmView: React.FC<RenderConfirm> = (props: RenderConfirm)
   ];
   const activeKeys = [props.item.result === '' ? props.item.id : ''];
   return (
-    <div className="rounded-lg border border-[#F0F0F0] bg-white  p-4  border-solid flex flex-col shadow-sm">
+    <div className="rounded-lg border border-[#F0F0F0] p-4  border-solid flex flex-col shadow-sm">
       <Collapse
         items={items}
         bordered={false}
         defaultActiveKey={activeKeys}
         expandIconPosition="end"
-        className="bg-white"
       />
       {props.item.result === '' && (
         <div className="footer self-end flex gap-2">

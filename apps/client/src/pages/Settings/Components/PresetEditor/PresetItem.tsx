@@ -36,7 +36,7 @@ export const PresetItem = ({
 
   return (
     <div 
-      className={`preset-item ${isDragging ? 'dragging' : ''} ${isOver ? 'drop-target' : ''} ${disabled ? 'disabled' : ''} bg-white`}
+      className={`preset-item ${isDragging ? 'dragging' : ''} ${isOver ? 'drop-target' : ''} ${disabled ? 'disabled' : ''}`}
       onMouseLeave={() => {
         setShowDeleteConfirm(false)
       }}

@@ -98,6 +98,7 @@ const placeholderNode: React.FC<PlaceholderNodeProps> = ({ onRequest }) => {
               alignItems: 'center',
               justifyContent: 'center',
               objectFit: 'contain',
+              filter: 'drop-shadow(0 0 1px white)'
             }}
           />
         }

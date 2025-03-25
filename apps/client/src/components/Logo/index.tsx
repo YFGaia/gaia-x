@@ -22,7 +22,10 @@ export const Logo: React.FC<LogoProps> = ({
             src={logoImage} 
             alt="logo" 
             className={className}
-            style={sizeValues[size]} 
+            style={{
+                ...sizeValues[size],
+                filter: 'drop-shadow(0 0 1px white)'
+            }} 
         />
     )
 };

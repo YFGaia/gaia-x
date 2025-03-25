@@ -17,10 +17,10 @@ export const appConfigSchema = {
                         "label": "浅色主题",
                         "value": "light"
                     },
-                    // {
-                    //     "label": "深色主题",
-                    //     "value": "dark"
-                    // }
+                    {
+                        "label": "深色主题",
+                        "value": "dark"
+                    }
                 ],
                 "order": 1
             },

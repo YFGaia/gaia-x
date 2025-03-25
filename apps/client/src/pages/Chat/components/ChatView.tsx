@@ -1,11 +1,9 @@
 import { RenderConfirmView } from '@/components/RenderConfirm';
-import useAzureOpenAI, { RequestOptions } from '@/components/useXAgent/AzureOpenAI';
 import { useConversation } from '@/hooks/Conversion';
-import { useOnChat } from '@/hooks/OnChat';
+import { RequestOptions, useOnChat } from '@/hooks/OnChat';
 import { useAppStateStore } from '@/stores/AppStateStore';
 import { useConversationStore } from '@/stores/ConversationStore';
 import { useRenderConfirmStore } from '@/stores/RenderConfirmStore';
-import { useUserStore } from '@/stores/UserStore';
 import { useViewStore } from '@/stores/ViewStore';
 import { isChatError, Message, MessageItem, ThoughtChainItemExpand } from '@/types/chat';
 import { ChatChannel, SettingChannel, ToolbarChannel } from '@/types/ipc/xKey';

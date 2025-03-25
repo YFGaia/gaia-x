@@ -22,7 +22,7 @@ interface AppStateStore extends AppState {
 }
 
 export const useAppStateStore = create<AppStateStore>((set) => ({
-  leftPanel: 'open',
+  leftPanel: 'close',
   rightPanel: 'close',
   mode: 'normal',
   canUpdate: false,

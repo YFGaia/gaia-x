@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Button, message, Form } from 'antd';
 import type { SystemPromptConfig } from '@/types/systemPromptConfig';
-import { useAzureOpenAI } from '@/components/useXAgent/AzureOpenAI';
+// import { useAzureOpenAI } from '@/components/useXAgent/AzureOpenAI';
 import { IpcChannels } from "@/types/ipc/ipc";
 
 const { TextArea } = Input;
@@ -137,7 +137,7 @@ const AiModelSettingView: React.FC = () => {
               minHeight: '400px',
               padding: '8px',
               borderRadius: '8px',
-              backgroundColor: '#fafafa',
+              // backgroundColor: '#fafafa',
               border: '1px solid #d9d9d9',
             }}
           />

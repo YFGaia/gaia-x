@@ -7,7 +7,7 @@ const Schedule: React.FC = () => {
     <div>
       {schedules.length > 0 && (
         <div
-          className={`absolute bottom-0 right-0 bg-[#FAFAFA] overflow-hidden z-10 w-[300px] rounded-sm px-2`}
+          className={`absolute bottom-0 right-0 overflow-hidden z-10 w-[300px] rounded-sm px-2`}
         >
           <Progress percent={percent} type="line" showInfo={false} size="small" />
           <div className="overflow-hidden whitespace-nowrap truncate">

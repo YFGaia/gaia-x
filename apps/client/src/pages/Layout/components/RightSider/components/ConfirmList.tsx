@@ -79,7 +79,7 @@ const ConfirmList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 bg-white h-full px-4 overflow-y-auto">
+    <div className="space-y-4 h-full px-4 overflow-y-auto">
       <Button onClick={addMarkdown}>addMarkdown</Button>
       <Button onClick={addHtml}>addHtml</Button>
       <Button onClick={addMarkdown}>addText</Button>
