@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"bytes"
@@ -23,6 +23,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,19 +43,21 @@ func TestClaudeStreamChatCompletionToChat(t *testing.T) {
 		{
 			name: "基本流式聊天完成测试",
 			request: ChatRequest{
-				Model: "claude-3-sonnet-20240229", // 根据实际可用的Claude模型调整
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "claude-3-sonnet-20240229",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "简单介绍一下自然语言处理。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "简单介绍一下自然语言处理。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
 			},
 		},
 	}
@@ -142,19 +145,21 @@ func TestClaudeCreateChatCompletionToChat(t *testing.T) {
 		{
 			name: "基本非流式聊天完成测试",
 			request: ChatRequest{
-				Model: "claude-3-sonnet-20240229", // 根据实际可用的Claude模型调整
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "claude-3-sonnet-20240229",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "简单介绍一下自然语言处理。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "简单介绍一下自然语言处理。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
 			},
 		},
 	}

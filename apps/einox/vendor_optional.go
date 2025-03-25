@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"net/http"

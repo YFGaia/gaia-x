@@ -1,4 +1,4 @@
-package llmadapter
+package einox
 
 import "github.com/sashabaranov/go-openai"
 

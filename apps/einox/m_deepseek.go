@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"context"
@@ -60,6 +60,11 @@ func (c *Config) getDeepSeekConfig() (*deepseek.ChatModelConfig, error) {
 	env := ENV
 	if env == "" {
 		env = "development"
+	}
+	//读取环境变量
+	err := LoadLLMConfigPathFromEnv()
+	if err != nil {
+		return nil, fmt.Errorf("读取环境变量失败: %v", err)
 	}
 
 	// 读取DeepSeek配置文件

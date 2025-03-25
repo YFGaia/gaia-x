@@ -27,6 +27,7 @@ require (
 	github.com/qiniu/qmgo v1.1.9
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/sashabaranov/go-openai v1.38.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/songzhibin97/gkit v1.2.13
 	github.com/spf13/viper v1.19.0
@@ -176,7 +177,6 @@ require (
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/sashabaranov/go-openai v1.38.0 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
@@ -238,8 +238,8 @@ require (
 	modernc.org/sqlite v1.34.5 // indirect
 )
 
-// 添加 llmadapter 包的依赖
-require github.com/gaia-x/server/service/llmadapter v0.0.0
+// 添加 einox 包的依赖
+require github.com/gaia-x/eino-x v0.0.0
 
-// 添加 replace 指令，将 llmadapter 包指向本地路径
-replace github.com/gaia-x/server/service/llmadapter => ./service/llmadapter
+// 添加 replace 指令，将 einox 包指向本地路径
+replace github.com/gaia-x/eino-x => ../../einox

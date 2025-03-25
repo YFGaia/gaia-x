@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"bytes"
@@ -23,6 +23,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,20 +52,23 @@ func TestCreateChatCompletionStream(t *testing.T) {
 		{
 			name: "基本流式聊天完成测试-bedrock",
 			request: ChatRequest{
-				Model: "anthropic.claude-3-5-sonnet-20240620-v1:0", // 使用实际可用的Bedrock模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+				Provider: "bedrock",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "简单介绍一下自然语言处理。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "简单介绍一下自然语言处理。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					Stream:      true,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				Stream:      true, // 流式请求
 			},
 			provider: "bedrock",
 			skipTest: false,
@@ -72,20 +76,23 @@ func TestCreateChatCompletionStream(t *testing.T) {
 		{
 			name: "基本流式聊天完成测试-azure",
 			request: ChatRequest{
-				Model: "gpt-4o", // 使用Azure OpenAI模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-4o",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "简单介绍一下人工智能。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "简单介绍一下人工智能。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					Stream:      true,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				Stream:      true, // 流式请求
 			},
 			provider:   "azure",
 			skipTest:   false,
@@ -94,20 +101,23 @@ func TestCreateChatCompletionStream(t *testing.T) {
 		{
 			name: "基本流式聊天完成测试-deepseek",
 			request: ChatRequest{
-				Model: "deepseek-chat", // 使用DeepSeek模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个专业的AI助手。",
+				Provider: "deepseek",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "deepseek-chat",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个专业的AI助手。",
+						},
+						{
+							Role:    "user",
+							Content: "请简单介绍一下机器学习的基本概念。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "请简单介绍一下机器学习的基本概念。",
-					},
+					MaxTokens:   150,
+					Temperature: 0.8,
+					Stream:      true,
 				},
-				MaxTokens:   150,
-				Temperature: 0.8,
-				Stream:      true, // 流式请求
 			},
 			provider:   "deepseek",
 			skipTest:   skipDeepSeekTests,
@@ -169,7 +179,7 @@ func TestCreateChatCompletionStream(t *testing.T) {
 					assert.NotEmpty(t, streamResp.ID, "响应ID不应为空")
 					assert.Equal(t, "chat.completion.chunk", streamResp.Object, "响应对象类型应为chat.completion.chunk")
 					assert.NotZero(t, streamResp.Created, "创建时间不应为零")
-					assert.Equal(t, tc.request.Model, streamResp.Model, "响应模型应与请求模型匹配")
+					assert.Equal(t, tc.request.ChatCompletionRequest.Model, streamResp.Model, "响应模型应与请求模型匹配")
 					assert.NotEmpty(t, streamResp.Choices, "选择不应为空")
 
 					// 收集内容
@@ -216,42 +226,48 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 		{
 			name: "基本非流式聊天完成测试-bedrock",
 			request: ChatRequest{
-				Model: "anthropic.claude-3-5-sonnet-20240620-v1:0", // 使用实际可用的Bedrock模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+				Provider: "bedrock",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "简单介绍一下自然语言处理。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "简单介绍一下自然语言处理。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					Stream:      false,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				Stream:      false, // 非流式请求
 			},
 			provider:    "bedrock",
-			expectError: false, // 现在我们期望这个测试能成功
+			expectError: false,
 			skipTest:    false,
 		},
 		{
 			name: "调用BedrockCreateChatCompletionToChat测试",
 			request: ChatRequest{
-				Model: "anthropic.claude-3-5-sonnet-20240620-v1:0", // 使用实际可用的Bedrock模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个简洁的助手。回答要精简。",
+				Provider: "bedrock",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个简洁的助手。回答要精简。",
+						},
+						{
+							Role:    "user",
+							Content: "什么是大模型？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "什么是大模型？",
-					},
+					MaxTokens:   50,
+					Temperature: 0.5,
+					Stream:      false,
 				},
-				MaxTokens:   50,
-				Temperature: 0.5,
-				Stream:      false, // 非流式请求
 			},
 			provider:    "bedrock",
 			expectError: false,
@@ -260,20 +276,23 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 		{
 			name: "基本非流式聊天完成测试-azure",
 			request: ChatRequest{
-				Model: "gpt-4o", // 使用Azure OpenAI模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个简洁的助手。回答要精简。",
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-4o",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个简洁的助手。回答要精简。",
+						},
+						{
+							Role:    "user",
+							Content: "什么是自然语言处理？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "什么是自然语言处理？",
-					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					Stream:      false,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				Stream:      false, // 非流式请求
 			},
 			provider:    "azure",
 			expectError: false,
@@ -283,20 +302,23 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 		{
 			name: "基本非流式聊天完成测试-deepseek",
 			request: ChatRequest{
-				Model: "deepseek-chat", // 使用DeepSeek模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个专业的AI助手。",
+				Provider: "deepseek",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "deepseek-chat",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个专业的AI助手。",
+						},
+						{
+							Role:    "user",
+							Content: "请解释什么是深度学习？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "请解释什么是深度学习？",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					Stream:      false,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				Stream:      false, // 非流式请求
 			},
 			provider:    "deepseek",
 			expectError: false,
@@ -306,20 +328,23 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 		{
 			name: "调用DeepSeekCreateChatCompletionToChat测试",
 			request: ChatRequest{
-				Model: "deepseek-chat", // 使用DeepSeek模型
-				Messages: []ChatMessage{
-					{
-						Role:    "system",
-						Content: "你是一个简洁的助手。回答要精简。",
+				Provider: "deepseek",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "deepseek-chat",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个简洁的助手。回答要精简。",
+						},
+						{
+							Role:    "user",
+							Content: "什么是强化学习？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "什么是强化学习？",
-					},
+					MaxTokens:   50,
+					Temperature: 0.5,
+					Stream:      false,
 				},
-				MaxTokens:   50,
-				Temperature: 0.5,
-				Stream:      false, // 非流式请求
 			},
 			provider:    "deepseek",
 			expectError: false,
@@ -329,11 +354,14 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 		{
 			name: "不支持的供应商测试",
 			request: ChatRequest{
-				Model: "some-model",
-				Messages: []ChatMessage{
-					{
-						Role:    "user",
-						Content: "Hello",
+				Provider: "unsupported",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "some-model",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "Hello",
+						},
 					},
 				},
 			},
@@ -372,7 +400,7 @@ func TestCreateChatCompletionNonStream(t *testing.T) {
 			assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 			assert.Equal(t, "chat.completion", resp.Object, "响应对象类型应为chat.completion")
 			assert.NotZero(t, resp.Created, "创建时间不应为零")
-			assert.Equal(t, tc.request.Model, resp.Model, "响应模型应与请求模型匹配")
+			assert.Equal(t, tc.request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 			assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 			if len(resp.Choices) > 0 {
@@ -395,21 +423,23 @@ func TestCreateChatCompletionWithDefaultProvider(t *testing.T) {
 
 	// 准备测试用例
 	request := ChatRequest{
-		Model: "anthropic.claude-3-5-sonnet-20240620-v1:0", // 使用实际可用的Bedrock模型
-		Messages: []ChatMessage{
-			{
-				Role:    "system",
-				Content: "你是一个有帮助的助手。",
+		Provider: "bedrock",
+		ChatCompletionRequest: openai.ChatCompletionRequest{
+			Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "system",
+					Content: "你是一个有帮助的助手。",
+				},
+				{
+					Role:    "user",
+					Content: "简单介绍一下自然语言处理。",
+				},
 			},
-			{
-				Role:    "user",
-				Content: "简单介绍一下自然语言处理。",
-			},
+			MaxTokens:   100,
+			Temperature: 0.7,
+			Stream:      true,
 		},
-		MaxTokens:   100,
-		Temperature: 0.7,
-		Stream:      true, // 流式请求
-		// 不设置Provider，使用默认值
 	}
 
 	// 创建缓冲区用于接收流式响应
@@ -446,17 +476,19 @@ func TestCreateChatCompletionCallsBedrockFunction(t *testing.T) {
 
 	// 创建测试请求
 	request := ChatRequest{
-		Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-		Messages: []ChatMessage{
-			{
-				Role:    "user",
-				Content: "这是一个测试请求",
+		Provider: "bedrock",
+		ChatCompletionRequest: openai.ChatCompletionRequest{
+			Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "这是一个测试请求",
+				},
 			},
+			Temperature: 0.7,
+			MaxTokens:   50,
+			Stream:      false,
 		},
-		Temperature: 0.7,
-		MaxTokens:   50,
-		Stream:      false, // 非流式请求
-		Provider:    "bedrock",
 	}
 
 	// 跳过实际API调用
@@ -488,7 +520,7 @@ func TestCreateChatCompletionCallsBedrockFunction(t *testing.T) {
 	assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 	assert.Equal(t, "chat.completion", resp.Object, "响应对象类型应为chat.completion")
 	assert.NotZero(t, resp.Created, "创建时间不应为零")
-	assert.Equal(t, request.Model, resp.Model, "响应模型应与请求模型匹配")
+	assert.Equal(t, request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 	assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 	if len(resp.Choices) > 0 {
@@ -509,17 +541,19 @@ func TestCreateChatCompletionCallsDeepSeekFunction(t *testing.T) {
 
 	// 创建测试请求
 	request := ChatRequest{
-		Model: "deepseek-chat",
-		Messages: []ChatMessage{
-			{
-				Role:    "user",
-				Content: "这是一个DeepSeek测试请求",
+		Provider: "deepseek",
+		ChatCompletionRequest: openai.ChatCompletionRequest{
+			Model: "deepseek-chat",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "这是一个DeepSeek测试请求",
+				},
 			},
+			Temperature: 0.7,
+			MaxTokens:   50,
+			Stream:      false,
 		},
-		Temperature: 0.7,
-		MaxTokens:   50,
-		Stream:      false, // 非流式请求
-		Provider:    "deepseek",
 	}
 
 	// 跳过实际API调用
@@ -551,7 +585,7 @@ func TestCreateChatCompletionCallsDeepSeekFunction(t *testing.T) {
 	assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 	assert.Equal(t, "chat.completion", resp.Object, "响应对象类型应为chat.completion")
 	assert.NotZero(t, resp.Created, "创建时间不应为零")
-	assert.Equal(t, request.Model, resp.Model, "响应模型应与请求模型匹配")
+	assert.Equal(t, request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 	assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 	if len(resp.Choices) > 0 {
@@ -574,21 +608,23 @@ func TestCreateChatCompletionDeepSeekStream(t *testing.T) {
 
 	// 创建测试请求
 	request := ChatRequest{
-		Model: "deepseek-chat",
-		Messages: []ChatMessage{
-			{
-				Role:    "system",
-				Content: "你是一个专业且有帮助的助手。",
+		Provider: "deepseek",
+		ChatCompletionRequest: openai.ChatCompletionRequest{
+			Model: "deepseek-chat",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "system",
+					Content: "你是一个专业且有帮助的助手。",
+				},
+				{
+					Role:    "user",
+					Content: "简要介绍计算机视觉的应用领域。",
+				},
 			},
-			{
-				Role:    "user",
-				Content: "简要介绍计算机视觉的应用领域。",
-			},
+			MaxTokens:   100,
+			Temperature: 0.7,
+			Stream:      true,
 		},
-		MaxTokens:   100,
-		Temperature: 0.7,
-		Stream:      true, // 流式请求
-		Provider:    "deepseek",
 	}
 
 	// 创建缓冲区用于接收流式响应
@@ -635,7 +671,7 @@ func TestCreateChatCompletionDeepSeekStream(t *testing.T) {
 			assert.NotEmpty(t, streamResp.ID, "响应ID不应为空")
 			assert.Equal(t, "chat.completion.chunk", streamResp.Object, "响应对象类型应为chat.completion.chunk")
 			assert.NotZero(t, streamResp.Created, "创建时间不应为零")
-			assert.Equal(t, request.Model, streamResp.Model, "响应模型应与请求模型匹配")
+			assert.Equal(t, request.ChatCompletionRequest.Model, streamResp.Model, "响应模型应与请求模型匹配")
 			assert.NotEmpty(t, streamResp.Choices, "选择不应为空")
 
 			// 收集内容

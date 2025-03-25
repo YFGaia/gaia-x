@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"context"
@@ -66,6 +66,11 @@ func (c *Config) getBedrockConfig() (*claude.Config, error) {
 	env := ENV
 	if env == "" {
 		env = "development"
+	}
+	//读取环境变量
+	err := LoadLLMConfigPathFromEnv()
+	if err != nil {
+		return nil, fmt.Errorf("读取环境变量失败: %v", err)
 	}
 
 	// 读取Bedrock配置文件
@@ -378,7 +383,7 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 			return nil, fmt.Errorf("转换工具信息失败: %v", err)
 		}
 
-		fmt.Printf("tools:%+V\n", tools)
+		fmt.Printf("tools:%+v\n", tools)
 
 		// 绑定
 		err = chatModel.BindTools(tools)

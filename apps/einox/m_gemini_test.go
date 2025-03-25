@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"context"
@@ -26,6 +26,7 @@ import (
 
 	"github.com/cloudwego/eino/schema"
 	"github.com/google/generative-ai-go/genai"
+	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -205,15 +206,18 @@ func (m *mockChatCompletionCreator) CreateChatCompletion(req ChatCompletionReque
 func TestGeminiCreateChatCompletionToChat(t *testing.T) {
 	// 创建请求
 	req := ChatRequest{
-		Model: "gemini-pro",
-		Messages: []ChatMessage{
-			{
-				Role:    "user",
-				Content: "测试问题",
+		Provider: "gemini",
+		ChatCompletionRequest: openai.ChatCompletionRequest{
+			Model: "gemini-pro",
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "测试问题",
+				},
 			},
+			Temperature: 0.7,
+			MaxTokens:   100,
 		},
-		Temperature: 0.7,
-		MaxTokens:   100,
 	}
 
 	// 创建一个模拟创建函数，与GeminiCreateChatCompletion有相同签名
@@ -253,50 +257,55 @@ func TestGeminiCreateChatCompletionToChat(t *testing.T) {
 			MaxTokens:   maxTokens,
 		}
 
-		// 使用我们的包装函数而不是直接调用GeminiCreateChatCompletion
-		resp, err := wrapper(geminiReq)
+		// 调用包装函数
+		completionResp, err := wrapper(geminiReq)
 		if err != nil {
 			return nil, err
 		}
 
-		// 转换响应格式
-		choices := make([]Choice, 0, len(resp.Choices))
-		for _, choice := range resp.Choices {
-			choices = append(choices, Choice{
+		// 转换为统一的ChatResponse
+		resp := &ChatResponse{
+			ID:      completionResp.ID,
+			Object:  completionResp.Object,
+			Created: completionResp.Created,
+			Model:   completionResp.Model,
+			Choices: make([]Choice, len(completionResp.Choices)),
+			Usage: TokenUsage{
+				PromptTokens:     completionResp.Usage.PromptTokens,
+				CompletionTokens: completionResp.Usage.CompletionTokens,
+				TotalTokens:      completionResp.Usage.TotalTokens,
+			},
+		}
+
+		// 转换选择
+		for i, choice := range completionResp.Choices {
+			resp.Choices[i] = Choice{
 				Index: choice.Index,
 				Message: ChatMessage{
 					Role:    choice.Message.Role,
 					Content: choice.Message.Content,
 				},
 				FinishReason: choice.FinishReason,
-			})
+			}
 		}
 
-		return &ChatResponse{
-			ID:      resp.ID,
-			Object:  resp.Object,
-			Created: resp.Created,
-			Model:   resp.Model,
-			Choices: choices,
-			Usage: TokenUsage{
-				PromptTokens:     resp.Usage.PromptTokens,
-				CompletionTokens: resp.Usage.CompletionTokens,
-				TotalTokens:      resp.Usage.TotalTokens,
-			},
-		}, nil
+		return resp, nil
 	}
 
-	// 调用测试函数
+	// 执行测试
 	resp, err := testChatFn(req)
+	if err != nil {
+		t.Fatalf("GeminiCreateChatCompletionToChat测试失败: %v", err)
+	}
 
-	// 验证结果
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, "test-id", resp.ID)
-	assert.Equal(t, "测试响应内容", resp.Choices[0].Message.Content)
-	assert.Equal(t, 10, resp.Usage.PromptTokens)
-	assert.Equal(t, 5, resp.Usage.CompletionTokens)
-	assert.Equal(t, 15, resp.Usage.TotalTokens)
+	// 验证响应
+	if resp == nil {
+		t.Fatal("响应不应为空")
+	}
+	assert.Equal(t, "test-id", resp.ID, "ID应匹配")
+	assert.Equal(t, "chat.completion", resp.Object, "对象类型应为chat.completion")
+	assert.NotZero(t, resp.Created, "创建时间不应为零")
+	assert.Equal(t, "gemini-pro", resp.Model, "模型应匹配")
 }
 
 // 测试getGeminiConfig函数

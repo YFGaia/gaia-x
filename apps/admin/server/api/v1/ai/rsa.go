@@ -3,7 +3,8 @@ package ai
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/gaia-x/server/service/llmadapter"
+	ServiceAi "github.com/flipped-aurora/gin-vue-admin/server/service/ai"
+	einox "github.com/gaia-x/eino-x"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -37,8 +38,11 @@ func (api *RSAApi) EncryptData(c *gin.Context) {
 		return
 	}
 
+	// 初始化环境变量
+	ServiceAi.InitEnvironment()
+
 	// 获取RSA加密函数
-	encryptFunc, _, err := llmadapter.InitRSAKeyManager()
+	encryptFunc, _, err := einox.InitRSAKeyManager()
 	if err != nil {
 		global.GVA_LOG.Error("初始化RSA密钥管理器失败", zap.Error(err))
 		response.FailWithMessage("初始化RSA密钥失败: "+err.Error(), c)

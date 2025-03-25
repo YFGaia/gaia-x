@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// Package llmadapter provides RSA encryption and decryption tools for LLM adapters
+// Package einox provides RSA encryption and decryption tools for LLM adapters
 // 该包提供了用于LLM适配器的RSA加密和解密工具函数
 //
 // 主要功能：
@@ -110,7 +110,7 @@
 //	if err != nil {
 //		log.Fatalf("解密失败: %v", err)
 //	}
-package llmadapter
+package einox
 
 import (
 	"crypto/rand"
@@ -123,12 +123,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 )
 
 const (
 	// RSAKeySize 定义RSA密钥长度
 	RSAKeySize = 2048
+	// RSAKeysEnvVar 定义环境变量名称，用于指定RSA密钥存储目录
+	RSAKeysEnvVar = "EINOX_RSA_KEYS_DIR"
 )
 
 var (
@@ -148,22 +149,22 @@ var (
 )
 
 // 初始化函数，动态设置密钥存储路径
-func init() {
-	// 使用runtime.Caller获取当前文件的路径
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		panic("无法获取当前文件路径")
+func InitializationSettings() {
+	// 首先检查环境变量是否设置了自定义密钥目录
+	customDir := os.Getenv(RSAKeysEnvVar)
+	if customDir != "" {
+		// 使用环境变量指定的目录
+		DefaultRSAKeysDir = customDir
+		DefaultPrivateKeyPath = filepath.Join(DefaultRSAKeysDir, "private_key.pem")
+		DefaultPublicKeyPath = filepath.Join(DefaultRSAKeysDir, "public_key.pem")
+		//fmt.Printf("使用环境变量 %s 指定的RSA密钥存储目录: %s\n", RSAKeysEnvVar, DefaultRSAKeysDir)
+		return
+	} else {
+		//无环境变量报错
+		//打印当前目录
+		fmt.Printf("未设置环境变量 %s\n", RSAKeysEnvVar)
+		panic(fmt.Sprintf("未设置环境变量 %s", RSAKeysEnvVar))
 	}
-
-	// 获取当前包的目录
-	dir := filepath.Dir(filename)
-
-	// 设置RSA密钥目录为当前包目录下的rsa_keys子目录
-	DefaultRSAKeysDir = filepath.Join(dir, "rsa_keys")
-	DefaultPrivateKeyPath = filepath.Join(DefaultRSAKeysDir, "private_key.pem")
-	DefaultPublicKeyPath = filepath.Join(DefaultRSAKeysDir, "public_key.pem")
-
-	fmt.Printf("RSA密钥将存储在: %s\n", DefaultRSAKeysDir)
 }
 
 // RSAKeyPair 保存RSA密钥对
@@ -409,6 +410,10 @@ func InitRSAKeyManager() (
 	encryptFunc func(string) (string, error),
 	decryptFunc func(string) (string, error),
 	err error) {
+
+	//InitializationSettings()
+	//初始化设置
+	InitializationSettings()
 
 	// 确保使用绝对路径
 	privateKeyPath := DefaultPrivateKeyPath

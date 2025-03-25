@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gaia-x/server/service/llmadapter"
+	"github.com/gaia-x/eino-x"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 
 	keyToEncrypt := os.Args[1]
 	// 初始化RSA密钥管理器
-	encryptFunc, _, err := llmadapter.InitRSAKeyManager()
+	encryptFunc, _, err := einox.InitRSAKeyManager()
 	if err != nil {
 		fmt.Printf("初始化RSA密钥管理器失败: %v\n", err)
 		return
@@ -47,6 +47,6 @@ func main() {
 	fmt.Println("加密结果:")
 	fmt.Println(encryptedKey)
 	fmt.Printf("\n密钥文件存储在: 私钥=%s, 公钥=%s\n",
-		llmadapter.DefaultPrivateKeyPath,
-		llmadapter.DefaultPublicKeyPath)
+		einox.DefaultPrivateKeyPath,
+		einox.DefaultPublicKeyPath)
 }

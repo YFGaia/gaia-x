@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"context"
@@ -30,63 +30,64 @@ import (
 	"path/filepath"
 	"time"
 
-	einoopenai "github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/cloudwego/eino-ext/components/model/claude"
 	"github.com/cloudwego/eino/schema"
 	"gopkg.in/yaml.v2"
 )
 
-// 直接使用原始结构体类型
-type AzureCredential struct {
-	Name         string   `yaml:"name"`
-	ApiKey       string   `yaml:"api_key"`
-	Endpoint     string   `yaml:"endpoint"`
-	DeploymentId string   `yaml:"deployment_id"`
-	ApiVersion   string   `yaml:"api_version"`
-	Enabled      bool     `yaml:"enabled"`
-	Weight       int      `yaml:"weight"`
-	QPSLimit     int      `yaml:"qps_limit"`
-	Description  string   `yaml:"description"`
-	Models       []string `yaml:"models"`
-	Timeout      int      `yaml:"timeout"`
-	Proxy        string   `yaml:"proxy"`
+// ClaudeCredential 定义Claude服务的凭证配置结构
+type ClaudeCredential struct {
+	Name        string   `yaml:"name"`
+	APIKey      string   `yaml:"api_key"`     // Claude API 密钥
+	BaseURL     string   `yaml:"base_url"`    // 自定义API端点URL
+	Enabled     bool     `yaml:"enabled"`     // 是否启用
+	Weight      int      `yaml:"weight"`      // 权重
+	QPSLimit    int      `yaml:"qps_limit"`   // QPS限制
+	Description string   `yaml:"description"` // 描述
+	Models      []string `yaml:"models"`      // 支持的模型列表
+	Timeout     int      `yaml:"timeout"`     // 超时时间
+	Proxy       string   `yaml:"proxy"`       // 代理设置
 }
 
-// 修改配置文件结构定义
-var azureConfig struct {
+// 配置文件结构定义
+var claudeConfig struct {
 	Environments map[string]struct {
-		Credentials []AzureCredential `yaml:"credentials"`
+		Credentials []ClaudeCredential `yaml:"credentials"`
 	} `yaml:"environments"`
 }
 
-// getAzureConfig 获取Azure配置
-func (c *Config) getAzureConfig() (*einoopenai.ChatModelConfig, error) {
+// getClaudeConfig 获取Claude配置
+func (c *Config) getClaudeConfig() (*claude.Config, error) {
 	// 使用统一定义的环境变量
 	env := ENV
 	if env == "" {
 		env = "development"
 	}
-
-	// 读取Azure配置文件
-	yamlFile, err := os.ReadFile(filepath.Join(LLMConfigPath, "azure.yaml"))
+	//读取环境变量
+	err := LoadLLMConfigPathFromEnv()
 	if err != nil {
-		return nil, fmt.Errorf("读取Azure配置文件失败: %v", err)
+		return nil, fmt.Errorf("读取环境变量失败: %v", err)
 	}
 
-	err = yaml.Unmarshal(yamlFile, &azureConfig)
+	// 读取Claude配置文件
+	yamlFile, err := os.ReadFile(filepath.Join(LLMConfigPath, "claude.yaml"))
 	if err != nil {
-		fmt.Printf("解析Azure配置文件失败: %v", err)
-		//抛出异常
-		return nil, err
+		return nil, fmt.Errorf("读取Claude配置文件失败: %v", err)
+	}
+
+	err = yaml.Unmarshal(yamlFile, &claudeConfig)
+	if err != nil {
+		return nil, fmt.Errorf("解析Claude配置文件失败: %v", err)
 	}
 
 	// 获取指定环境的配置
-	envConfig, ok := azureConfig.Environments[env]
+	envConfig, ok := claudeConfig.Environments[env]
 	if !ok {
 		return nil, fmt.Errorf("未找到环境 %s 的配置", env)
 	}
 
 	// 存储启用的配置
-	var enabledCredentials []AzureCredential
+	var enabledCredentials []ClaudeCredential
 
 	// 遍历该环境下的所有凭证配置
 	for _, cred := range envConfig.Credentials {
@@ -102,7 +103,7 @@ func (c *Config) getAzureConfig() (*einoopenai.ChatModelConfig, error) {
 	}
 
 	// 根据权重选择配置
-	var selectedCred AzureCredential
+	var selectedCred ClaudeCredential
 	if len(enabledCredentials) > 1 {
 		// 计算总权重
 		totalWeight := 0
@@ -128,71 +129,71 @@ func (c *Config) getAzureConfig() (*einoopenai.ChatModelConfig, error) {
 		selectedCred = enabledCredentials[0]
 	}
 
-	// 确保微软Azure配置存在
-	if c.VendorOptional == nil {
-		c.VendorOptional = &VendorOptional{}
-	}
-	if c.VendorOptional.AzureConfig == nil {
-		c.VendorOptional.AzureConfig = &AzureConfig{}
-	}
-
-	//判断c.VendorOptional.AzureConfig.HTTPClient 可完善优化
-	if c.VendorOptional.AzureConfig.HTTPClient == nil {
-		c.VendorOptional.AzureConfig.HTTPClient = &http.Client{}
-	}
-
-	//判断代理设置不为空设置代理 可完善优化
-	if selectedCred.Proxy != "" {
-		c.VendorOptional.AzureConfig.HTTPClient.Transport = &http.Transport{
-			Proxy: func(req *http.Request) (*url.URL, error) {
-				return url.Parse(selectedCred.Proxy)
-			},
-		}
-	}
-
-	//selectedCred.Timeout大于0时设置请求超时时间
-	if selectedCred.Timeout > 0 {
-		c.VendorOptional.AzureConfig.HTTPClient.Timeout = time.Duration(selectedCred.Timeout) * time.Second
-	}
-
-	//selectedCred.ApiKey 解密
-	// 第一次初始化，应该生成新的密钥文件
-	_, decryptFunc1, err := InitRSAKeyManager()
+	// 解密凭证
+	_, decryptFunc, err := InitRSAKeyManager()
 	if err != nil {
 		return nil, fmt.Errorf("初始化RSA密钥管理器失败: %v", err)
 	}
-	selectedCred.ApiKey, err = decryptFunc1(selectedCred.ApiKey)
+
+	// APIKey解密
+	selectedCred.APIKey, err = decryptFunc(selectedCred.APIKey)
 	if err != nil {
-		return nil, fmt.Errorf("解密失败: %v", err)
+		return nil, fmt.Errorf("解密APIKey失败: %v", err)
 	}
 
-	nConf := &einoopenai.ChatModelConfig{
-		ByAzure:     true,
-		APIKey:      selectedCred.ApiKey,
-		BaseURL:     selectedCred.Endpoint,
-		APIVersion:  selectedCred.ApiVersion,
-		Model:       c.Model,
-		MaxTokens:   &c.MaxTokens,
-		Temperature: c.Temperature,
-		TopP:        c.TopP,
-		Stop:        c.Stop,
-		// 补充额外参数
-		HTTPClient:       c.VendorOptional.AzureConfig.HTTPClient,
-		PresencePenalty:  c.VendorOptional.AzureConfig.PresencePenalty,
-		FrequencyPenalty: c.VendorOptional.AzureConfig.FrequencyPenalty,
-		LogitBias:        c.VendorOptional.AzureConfig.LogitBias,
-		ResponseFormat:   c.VendorOptional.AzureConfig.ResponseFormat,
-		Seed:             c.VendorOptional.AzureConfig.Seed,
-		User:             c.VendorOptional.AzureConfig.User,
+	// 创建Claude配置
+	claudeConf := &claude.Config{
+		APIKey:        selectedCred.APIKey,
+		Model:         c.Model,
+		MaxTokens:     c.MaxTokens,
+		Temperature:   c.Temperature,
+		TopP:          c.TopP,
+		StopSequences: c.Stop,
 	}
-	return nConf, nil
+
+	// 如果设置了BaseURL
+	if selectedCred.BaseURL != "" {
+		claudeConf.BaseURL = &selectedCred.BaseURL
+	}
+
+	// 确保ClaudeConfig存在
+	if c.VendorOptional == nil {
+		c.VendorOptional = &VendorOptional{}
+	}
+	if c.VendorOptional.ClaudeConfig == nil {
+		c.VendorOptional.ClaudeConfig = &ClaudeConfig{}
+	}
+
+	// 从ClaudeConfig获取TopK参数
+	if c.VendorOptional.ClaudeConfig.TopK != nil {
+		claudeConf.TopK = c.VendorOptional.ClaudeConfig.TopK
+	}
+
+	// 如果设置了代理
+	if selectedCred.Proxy != "" {
+		// 设置代理URL
+		c.ProxyURL = selectedCred.Proxy
+		// 创建HTTP客户端
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				Proxy: func(req *http.Request) (*url.URL, error) {
+					return url.Parse(selectedCred.Proxy)
+				},
+			},
+		}
+
+		// 在函数级别设置HTTP客户端
+		http.DefaultClient = httpClient
+	}
+
+	return claudeConf, nil
 }
 
-// AzureCreateChatCompletion 使用Azure OpenAI服务创建聊天完成
-func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCompletionResponse, error) {
-	// 创建Azure OpenAI配置
+// ClaudeCreateChatCompletion 使用Claude API服务创建聊天完成
+func ClaudeCreateChatCompletion(req ChatRequest) (*openai.ChatCompletionResponse, error) {
+	// 创建Claude配置
 	conf := &Config{
-		Vendor:      "azure",
+		Vendor:      "claude",
 		Model:       req.Model,
 		MaxTokens:   req.MaxTokens,
 		Temperature: &req.Temperature,
@@ -200,17 +201,17 @@ func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCo
 		Stop:        req.Stop,
 	}
 
-	// 获取Azure配置
-	azureConf, err := conf.getAzureConfig()
+	// 获取Claude配置
+	claudeConf, err := conf.getClaudeConfig()
 	if err != nil {
-		return nil, fmt.Errorf("获取Azure配置失败: %v", err)
+		return nil, fmt.Errorf("获取Claude配置失败: %v", err)
 	}
 
 	// 创建上下文
 	ctx := context.Background()
 
 	// 创建聊天模型
-	chatModel, err := einoopenai.NewChatModel(ctx, azureConf)
+	chatModel, err := claude.NewChatModel(ctx, claudeConf)
 	if err != nil {
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
@@ -244,7 +245,7 @@ func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCo
 	}
 
 	// 生成唯一ID
-	uniqueID := fmt.Sprintf("azure-%d", time.Now().UnixNano())
+	uniqueID := fmt.Sprintf("claude-%d", time.Now().UnixNano())
 
 	// 获取Token使用情况
 	var usage openai.Usage
@@ -267,48 +268,34 @@ func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCo
 	}, nil
 }
 
-// AzureCreateChatCompletionToChat 使用Azure OpenAI服务创建聊天完成接口
-func AzureCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionResponse, error) {
-	// 准备请求参数
-	model := req.Model
-	if model == "" {
-		// 如果没有指定模型，可以设置一个默认值或返回错误
-		return nil, fmt.Errorf("未指定模型名称")
-	}
-
-	// 创建Azure请求
-	azureReq := openai.ChatCompletionRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-	}
-
-	// 调用Azure服务
-	resp, err := AzureCreateChatCompletion(azureReq)
+// ClaudeCreateChatCompletionToChat 使用Claude API服务创建聊天完成
+func ClaudeCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionResponse, error) {
+	// 调用Claude聊天API
+	completionResp, err := ClaudeCreateChatCompletion(req)
 	if err != nil {
-		return nil, fmt.Errorf("调用Azure聊天接口失败: %w", err)
+		return nil, fmt.Errorf("调用Claude聊天接口失败: %w", err)
 	}
 
+	// 构造并返回响应
 	return &openai.ChatCompletionResponse{
-		ID:      resp.ID,
-		Object:  resp.Object,
-		Created: resp.Created,
-		Model:   resp.Model,
-		Choices: resp.Choices,
+		ID:      completionResp.ID,
+		Object:  completionResp.Object,
+		Created: completionResp.Created,
+		Model:   completionResp.Model,
+		Choices: completionResp.Choices,
 		Usage: openai.Usage{
-			PromptTokens:     resp.Usage.PromptTokens,
-			CompletionTokens: resp.Usage.CompletionTokens,
-			TotalTokens:      resp.Usage.TotalTokens,
+			PromptTokens:     completionResp.Usage.PromptTokens,
+			CompletionTokens: completionResp.Usage.CompletionTokens,
+			TotalTokens:      completionResp.Usage.TotalTokens,
 		},
 	}, nil
 }
 
-// AzureStreamChatCompletion 使用Azure OpenAI服务创建流式聊天完成
-func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.ChatCompletionStreamResponse], error) {
-	// 创建Azure OpenAI配置
+// ClaudeStreamChatCompletion 使用Claude API服务创建流式聊天完成
+func ClaudeStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*ChatCompletionStreamResponse], error) {
+	// 创建Claude配置
 	conf := &Config{
-		Vendor:      "azure",
+		Vendor:      "claude",
 		Model:       req.Model,
 		MaxTokens:   req.MaxTokens,
 		Temperature: &req.Temperature,
@@ -316,17 +303,17 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 		Stop:        req.Stop,
 	}
 
-	// 获取Azure配置
-	azureConf, err := conf.getAzureConfig()
+	// 获取Claude配置
+	claudeConf, err := conf.getClaudeConfig()
 	if err != nil {
-		return nil, fmt.Errorf("获取Azure配置失败: %v", err)
+		return nil, fmt.Errorf("获取Claude配置失败: %v", err)
 	}
 
 	// 创建上下文
 	ctx := context.Background()
 
 	// 创建聊天模型
-	chatModel, err := einoopenai.NewChatModel(ctx, azureConf)
+	chatModel, err := claude.NewChatModel(ctx, claudeConf)
 	if err != nil {
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
@@ -348,20 +335,20 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 	}
 
 	// 创建结果通道
-	resultReader, resultWriter := schema.Pipe[*openai.ChatCompletionStreamResponse](10)
+	resultReader, resultWriter := schema.Pipe[*ChatCompletionStreamResponse](10)
 
 	// 启动goroutine处理流式数据
 	go func() {
 		defer func() {
 			if panicErr := recover(); panicErr != nil {
-				fmt.Printf("Azure Stream处理发生异常: %v\n", panicErr)
+				fmt.Printf("Claude Stream处理发生异常: %v\n", panicErr)
 			}
 			streamReader.Close()
 			resultWriter.Close()
 		}()
 
 		// 生成唯一ID
-		uniqueID := fmt.Sprintf("azure-stream-%d", time.Now().UnixNano())
+		uniqueID := fmt.Sprintf("claude-stream-%d", time.Now().UnixNano())
 		created := time.Now().Unix()
 
 		for {
@@ -373,20 +360,20 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 			}
 			if err != nil {
 				// 处理错误
-				_ = resultWriter.Send(nil, fmt.Errorf("从Azure接收流数据失败: %v", err))
+				_ = resultWriter.Send(nil, fmt.Errorf("从Claude接收流数据失败: %v", err))
 				return
 			}
 
 			// 构造流式响应
-			streamResp := &openai.ChatCompletionStreamResponse{
+			streamResp := &ChatCompletionStreamResponse{
 				ID:      uniqueID,
 				Object:  "chat.completion.chunk",
 				Created: created,
 				Model:   req.Model,
-				Choices: []openai.ChatCompletionStreamChoice{
+				Choices: []ChatCompletionStreamChoice{
 					{
 						Index: 0,
-						Delta: openai.ChatCompletionStreamChoiceDelta{
+						Delta: ChatCompletionStreamDelta{
 							Role:    string(message.Role),
 							Content: message.Content,
 						},
@@ -397,7 +384,7 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 
 			// 如果是最后一条消息，设置完成原因
 			if message.ResponseMeta != nil && message.ResponseMeta.FinishReason != "" {
-				streamResp.Choices[0].FinishReason = openai.FinishReason(message.ResponseMeta.FinishReason)
+				streamResp.Choices[0].FinishReason = message.ResponseMeta.FinishReason
 			}
 
 			// 发送流式响应
@@ -411,12 +398,12 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 	return resultReader, nil
 }
 
-// AzureStreamChatCompletionToChat 使用Azure OpenAI服务创建流式聊天完成并转换为聊天流格式
-func AzureStreamChatCompletionToChat(req ChatRequest, writer io.Writer) error {
-	// 调用Azure流式聊天API
-	streamReader, err := AzureStreamChatCompletion(req)
+// ClaudeStreamChatCompletionToChat 使用Claude API服务创建流式聊天完成
+func ClaudeStreamChatCompletionToChat(req ChatRequest, writer io.Writer) error {
+	// 调用Claude流式聊天API
+	streamReader, err := ClaudeStreamChatCompletion(req)
 	if err != nil {
-		return fmt.Errorf("调用Azure流式聊天接口失败: %w", err)
+		return fmt.Errorf("调用Claude流式聊天接口失败: %w", err)
 	}
 	// 注意：由于streamReader没有Close方法，我们不需要defer close
 
@@ -427,15 +414,28 @@ func AzureStreamChatCompletionToChat(req ChatRequest, writer io.Writer) error {
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("接收Azure流式响应失败: %w", err)
+			return fmt.Errorf("接收Claude流式响应失败: %w", err)
 		}
 
-		streamResp := openai.ChatCompletionStreamResponse{
+		// 转换响应格式
+		choices := make([]StreamChoice, 0, len(response.Choices))
+		for _, choice := range response.Choices {
+			choices = append(choices, StreamChoice{
+				Index: choice.Index,
+				Delta: StreamChoiceDelta{
+					Role:    choice.Delta.Role,
+					Content: choice.Delta.Content,
+				},
+				FinishReason: choice.FinishReason,
+			})
+		}
+
+		streamResp := StreamResponse{
 			ID:      response.ID,
 			Object:  response.Object,
 			Created: response.Created,
 			Model:   response.Model,
-			Choices: response.Choices,
+			Choices: choices,
 		}
 
 		// 将响应写入writer

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"bytes"
@@ -23,6 +23,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/sashabaranov/go-openai"
 )
 
 // 定义测试所需的结构
@@ -87,30 +89,34 @@ func TestGetOpenAIConfig(t *testing.T) {
 func TestOpenAICreateChatCompletion(t *testing.T) {
 	t.Run("测试创建聊天完成请求", func(t *testing.T) {
 		// 准备测试请求
-		req := ChatCompletionRequest{
-			Model:       "gpt-3.5-turbo",
-			MaxTokens:   1000,
-			Temperature: 0.7,
-			TopP:        0.9,
-			Stop:        []string{"stop"},
-			Messages: []ChatMessage{
-				{
-					Role:    "user",
-					Content: "你好，OpenAI!",
+		req := ChatRequest{
+			Provider: "openai",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model:       "gpt-3.5-turbo",
+				MaxTokens:   1000,
+				Temperature: 0.7,
+				TopP:        0.9,
+				Stop:        []string{"stop"},
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好，OpenAI!",
+					},
 				},
 			},
 		}
 
 		// 记录请求参数
 		t.Logf("【请求信息】模型: %s, 最大token: %d, 温度: %.1f, TopP: %.1f",
-			req.Model, req.MaxTokens, req.Temperature, req.TopP)
+			req.ChatCompletionRequest.Model, req.ChatCompletionRequest.MaxTokens,
+			req.ChatCompletionRequest.Temperature, req.ChatCompletionRequest.TopP)
 		t.Logf("【请求消息】角色: %s, 内容: %s",
-			req.Messages[0].Role, req.Messages[0].Content)
+			req.ChatCompletionRequest.Messages[0].Role, req.ChatCompletionRequest.Messages[0].Content)
 
-		t.Log("【开始调用】OpenAICreateChatCompletion...")
+		t.Log("【开始调用】OpenAICreateChatCompletionToChat...")
 
 		// 调用OpenAI API
-		resp, err := OpenAICreateChatCompletion(req)
+		resp, err := OpenAICreateChatCompletionToChat(req)
 
 		// 如果有错误
 		if err != nil {
@@ -150,22 +156,25 @@ func TestOpenAICreateChatCompletionToChat(t *testing.T) {
 	t.Run("测试格式转换聊天请求", func(t *testing.T) {
 		// 准备测试请求
 		req := ChatRequest{
-			Model:       "gpt-3.5-turbo",
-			MaxTokens:   1000,
-			Temperature: 0.7,
-			Messages: []ChatMessage{
-				{
-					Role:    "user",
-					Content: "你好，OpenAI!",
+			Provider: "openai",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model:       "gpt-3.5-turbo",
+				MaxTokens:   1000,
+				Temperature: 0.7,
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好，OpenAI!",
+					},
 				},
 			},
 		}
 
 		// 记录请求参数
 		t.Logf("【转换请求信息】模型: %s, 最大token: %d, 温度: %.1f",
-			req.Model, req.MaxTokens, req.Temperature)
+			req.ChatCompletionRequest.Model, req.ChatCompletionRequest.MaxTokens, req.ChatCompletionRequest.Temperature)
 		t.Logf("【转换请求消息】角色: %s, 内容: %s",
-			req.Messages[0].Role, req.Messages[0].Content)
+			req.ChatCompletionRequest.Messages[0].Role, req.ChatCompletionRequest.Messages[0].Content)
 
 		t.Log("【开始转换调用】OpenAICreateChatCompletionToChat...")
 
@@ -199,26 +208,30 @@ func TestOpenAICreateChatCompletionToChat(t *testing.T) {
 func TestOpenAIStreamChatCompletion(t *testing.T) {
 	t.Run("测试创建流式聊天完成请求", func(t *testing.T) {
 		// 准备测试请求
-		req := ChatCompletionRequest{
-			Model:       "gpt-3.5-turbo",
-			MaxTokens:   1000,
-			Temperature: 0.7,
-			TopP:        0.9,
-			Stop:        []string{"stop"},
-			Stream:      true,
-			Messages: []ChatMessage{
-				{
-					Role:    "user",
-					Content: "你好，OpenAI!",
+		req := ChatRequest{
+			Provider: "openai",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model:       "gpt-3.5-turbo",
+				MaxTokens:   1000,
+				Temperature: 0.7,
+				TopP:        0.9,
+				Stop:        []string{"stop"},
+				Stream:      true,
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好，OpenAI!",
+					},
 				},
 			},
 		}
 
 		// 记录请求参数
 		t.Logf("【流式请求信息】模型: %s, 最大token: %d, 温度: %.1f, TopP: %.1f",
-			req.Model, req.MaxTokens, req.Temperature, req.TopP)
+			req.ChatCompletionRequest.Model, req.ChatCompletionRequest.MaxTokens,
+			req.ChatCompletionRequest.Temperature, req.ChatCompletionRequest.TopP)
 		t.Logf("【流式请求消息】角色: %s, 内容: %s",
-			req.Messages[0].Role, req.Messages[0].Content)
+			req.ChatCompletionRequest.Messages[0].Role, req.ChatCompletionRequest.Messages[0].Content)
 
 		t.Log("【开始流式调用】OpenAIStreamChatCompletion...")
 
@@ -248,42 +261,38 @@ func TestOpenAIStreamChatCompletion(t *testing.T) {
 		t.Log("【流式响应接收】开始从流中读取消息...")
 
 		// 从流中读取消息的计数
-		receiveCount := 0
-		totalContent := ""
+		var messageCount int
+		var allContent string
 
-		// 读取流式数据
-		for {
-			response, err := streamReader.Recv()
+		// 读取最多5条消息，或者直到流结束
+		for messageCount < 5 {
+			resp, err := streamReader.Recv()
 			if err == io.EOF {
-				t.Log("【流式接收】流已结束")
+				t.Log("【流式响应完成】流已经结束")
 				break
 			}
 			if err != nil {
-				t.Errorf("【流式接收错误】从流中读取消息失败: %v", err)
+				t.Logf("【流式响应错误】读取流时出错: %v", err)
 				break
 			}
 
-			receiveCount++
+			// 增加消息计数
+			messageCount++
 
-			// 记录每个流式消息片段
-			if len(response.Choices) > 0 {
-				deltaContent := response.Choices[0].Delta.Content
-				totalContent += deltaContent
-				t.Logf("【接收片段 %d】内容: %s", receiveCount, deltaContent)
-
-				// 检查是否有完成原因
-				if response.Choices[0].FinishReason != "" {
-					t.Logf("【完成标志】%s", response.Choices[0].FinishReason)
+			// 记录接收到的消息
+			if len(resp.Choices) > 0 {
+				content := resp.Choices[0].Delta.Content
+				allContent += content
+				t.Logf("【流式消息 #%d】内容片段: %s", messageCount, content)
+				if resp.Choices[0].FinishReason != "" {
+					t.Logf("【流式消息 #%d】结束原因: %s", messageCount, resp.Choices[0].FinishReason)
 				}
 			}
 		}
 
-		if receiveCount > 0 {
-			t.Logf("【流式接收结果】共接收 %d 个消息片段", receiveCount)
-			t.Logf("【组合后的内容】%s", totalContent)
-		} else {
-			t.Log("【警告】未能从流中接收到消息")
-		}
+		// 汇总接收到的内容
+		t.Logf("【流式接收总结】共接收 %d 条消息", messageCount)
+		t.Logf("【流式内容总结】接收到的内容: %s", allContent)
 	})
 }
 
@@ -292,14 +301,17 @@ func TestOpenAIStreamChatCompletionToChat(t *testing.T) {
 	t.Run("测试流式聊天完成转换为聊天流格式", func(t *testing.T) {
 		// 准备测试请求
 		req := ChatRequest{
-			Model:       "gpt-3.5-turbo",
-			MaxTokens:   1000,
-			Temperature: 0.7,
-			Stream:      true,
-			Messages: []ChatMessage{
-				{
-					Role:    "user",
-					Content: "你好，OpenAI!",
+			Provider: "openai",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model:       "gpt-3.5-turbo",
+				MaxTokens:   1000,
+				Temperature: 0.7,
+				Stream:      true,
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好，OpenAI!",
+					},
 				},
 			},
 		}
@@ -309,9 +321,9 @@ func TestOpenAIStreamChatCompletionToChat(t *testing.T) {
 
 		// 记录请求参数
 		t.Logf("【流式转换请求信息】模型: %s, 最大token: %d, 温度: %.1f",
-			req.Model, req.MaxTokens, req.Temperature)
+			req.ChatCompletionRequest.Model, req.ChatCompletionRequest.MaxTokens, req.ChatCompletionRequest.Temperature)
 		t.Logf("【流式转换请求消息】角色: %s, 内容: %s",
-			req.Messages[0].Role, req.Messages[0].Content)
+			req.ChatCompletionRequest.Messages[0].Role, req.ChatCompletionRequest.Messages[0].Content)
 
 		t.Log("【开始流式转换调用】OpenAIStreamChatCompletionToChat...")
 

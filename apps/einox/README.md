@@ -48,7 +48,7 @@ type Config struct {
 
 ```go
 // 创建配置
-config := &llmadapter.Config{
+config := &einox.Config{
     Vendor:     "openai",
     Timeout:    60,
     MaxRetries: 5,
@@ -78,7 +78,7 @@ if err != nil {
     log.Fatalf("读取配置文件失败: %v", err)
 }
 
-var config llmadapter.Config
+var config einox.Config
 err = yaml.Unmarshal(yamlFile, &config)
 if err != nil {
     log.Fatalf("解析YAML失败: %v", err)
@@ -137,7 +137,7 @@ LLM适配器提供了RSA加密工具，用于加密敏感信息（如API密钥�
 # 进入项目目录
 cd apps/admin/server
 # 加密
-go run service/llmadapter/cmd/encrypt/main.go "sk-abcdefg123456"
+go run service/einox/cmd/encrypt/main.go "sk-abcdefg123456"
 ```
 
 加密后的字符串可以安全地存储在配置文件或环境变量中。密钥文件存储在当前包目录下的 `rsa_keys` 子目录中：
@@ -150,7 +150,7 @@ go run service/llmadapter/cmd/encrypt/main.go "sk-abcdefg123456"
 
 ```go
 // 初始化RSA密钥管理器
-encryptFunc, decryptFunc, err := llmadapter.InitRSAKeyManager()
+encryptFunc, decryptFunc, err := einox.InitRSAKeyManager()
 if err != nil {
     log.Fatalf("初始化RSA密钥管理器失败: %v", err)
 }
@@ -173,7 +173,7 @@ if err != nil {
 
 ```go
 // 直接加密字符串
-encryptedKey, err := llmadapter.EncryptKey("sk-abcdefg123456")
+encryptedKey, err := einox.EncryptKey("sk-abcdefg123456")
 if err != nil {
     log.Fatalf("加密失败: %v", err)
 }

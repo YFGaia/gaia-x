@@ -1,8 +1,9 @@
 package ai
 
 import (
-	"github.com/gaia-x/server/service/llmadapter"
 	"net/http"
+
+	einox "github.com/gaia-x/eino-x"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -23,7 +24,7 @@ type ChatApi struct{}
 // @Success 200 {object} ai.StreamResponse "流式聊天响应"
 // @Router /v1/chat/completion [post]
 func (api *ChatApi) CreateChatCompletion(c *gin.Context) {
-	var req llmadapter.ChatRequest
+	var req einox.ChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.FailWithMessage("参数解析失败: "+err.Error(), c)
 		return

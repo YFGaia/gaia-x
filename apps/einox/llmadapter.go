@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-// Package llmadapter provides a unified adapter interface for Large Language Models (LLMs)
-// 软件包llmadapter提供了大型语言模型（LLMS）的统一适配器接口
-package llmadapter
+// Package einox provides a unified adapter interface for Large Language Models (LLMs)
+// 软件包einox提供了大型语言模型（LLMS）的统一适配器接口
+package einox
 
 import (
 	"errors"
-	"github.com/sashabaranov/go-openai"
 	"io"
 	"os"
-	"path/filepath"
-	"runtime"
+
+	"github.com/sashabaranov/go-openai"
 )
 
 // 配置文件路径常量
@@ -38,31 +37,33 @@ var (
 	ENV string
 )
 
-// 初始化配置路径
-func init() {
-	// 获取当前文件的绝对路径
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		// 获取路径失败，这是一个严重错误
-		panic("无法获取当前文件路径，无法正确初始化LLM配置目录")
+// LoadLLMConfigPathFromEnv 从环境变量中读取LLM配置路径
+// 如果环境变量未设置，则返回错误
+func LoadLLMConfigPathFromEnv() error {
+	// 尝试从环境变量LLM_CONFIG_PATH读取配置路径
+	configPath := os.Getenv("LLM_CONFIG_PATH")
+	if configPath == "" {
+		return errors.New("环境变量LLM_CONFIG_PATH未设置，无法初始化LLM配置目录")
 	}
 
-	// 使用当前文件所在目录的绝对路径
-	dir := filepath.Dir(filename)
-	LLMConfigPath = filepath.Join(dir, "config", "llm")
-
 	// 确保配置目录存在
-	if _, err := os.Stat(LLMConfigPath); os.IsNotExist(err) {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		// 如果目录不存在，创建它
-		err = os.MkdirAll(LLMConfigPath, 0755)
+		err = os.MkdirAll(configPath, 0755)
 		if err != nil {
-			// 创建目录失败是严重错误，应该立即通知
-			panic("无法创建LLM配置目录: " + err.Error())
+			return errors.New("无法创建LLM配置目录: " + err.Error())
 		}
 	}
 
+	// 设置全局变量
+	LLMConfigPath = configPath
+	return nil
+}
+
+// 初始化配置路径
+func init() {
 	// 从GIN_MODE读取环境变量
-	// 注意：此处不使用gin.Mode()是因为llmadapter是独立模块，
+	// 注意：此处不使用gin.Mode()是因为einox是独立模块，
 	// 不希望引入对gin框架的直接依赖，以保持模块的通用性
 	ENV = os.Getenv("GIN_MODE")
 	//GIN_MODE 可能有的值: debug, release, test
@@ -83,7 +84,7 @@ func init() {
 
 // SetENV 允许用户手动设置环境变量
 // 这对于集成到使用其他框架的项目中很有用
-// 例如，可以在初始化时调用：llmadapter.SetENV(gin.Mode())
+// 例如，可以在初始化时调用：einox.SetENV(gin.Mode())
 func SetENV(env string) {
 	if env != "" {
 		ENV = env

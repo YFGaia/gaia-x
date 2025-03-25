@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package llmadapter
+package einox
 
 import (
 	"context"
 	"fmt"
-	"github.com/sashabaranov/go-openai"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/sashabaranov/go-openai"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -283,25 +284,28 @@ func TestAzureStreamChatCompletion(t *testing.T) {
 	// 准备测试用例
 	testCases := []struct {
 		name    string
-		request openai.ChatCompletionRequest
+		request ChatRequest // 改为使用ChatRequest类型
 	}{
 		{
 			name: "基本流式聊天完成测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "你好，请用5个字简短地介绍一下自己。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "你好，请用5个字简短地介绍一下自己。",
-					},
+					MaxTokens:   20,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   20,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 		},
 	}
@@ -352,7 +356,7 @@ func TestAzureStreamChatCompletion(t *testing.T) {
 					assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 					assert.Equal(t, "chat.completion.chunk", resp.Object, "响应对象类型应为chat.completion.chunk")
 					assert.NotZero(t, resp.Created, "创建时间不应为零")
-					assert.Equal(t, tc.request.Model, resp.Model, "响应模型应与请求模型匹配")
+					assert.Equal(t, tc.request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 					assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 					// 保存ID以便验证所有响应的ID一致

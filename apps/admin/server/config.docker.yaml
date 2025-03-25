@@ -117,8 +117,8 @@ db-list:
 
 # local configuration
 local:
-  path: uploads/file
-  store-path: uploads/file
+  path: data/uploads/file
+  store-path: data/uploads/file
 
 # autocode configuration
 autocode:
