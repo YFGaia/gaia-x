@@ -76,6 +76,8 @@ type ChatCompletionStreamDelta struct {
 type ChatRequest struct {
 	Provider string `json:"provider,omitempty"` // 供应商：openai, azure等
 	openai.ChatCompletionRequest
+	//额外参数
+	Extra map[string]any `json:"extra,omitempty"` // 额外参数
 }
 
 // ChatResponse 聊天响应

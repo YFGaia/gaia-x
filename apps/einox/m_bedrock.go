@@ -27,6 +27,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -213,14 +214,23 @@ func (c *Config) getBedrockConfig() (*claude.Config, error) {
 }
 
 // BedrockCreateChatCompletion 使用AWS Bedrock服务创建聊天完成
-func BedrockCreateChatCompletion(req ChatCompletionRequest) (*openai.ChatCompletionResponse, error) {
+func BedrockCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionResponse, error) {
+	// 准备请求参数
+	model := req.Model
+	if model == "" {
+		// 如果没有指定模型，可以设置一个默认值或返回错误
+		return nil, fmt.Errorf("未指定模型名称")
+	}
 	// 创建Bedrock配置
+	temperature := float32(req.Temperature)
+	topP := float32(req.TopP)
+
 	conf := &Config{
 		Vendor:      "bedrock",
 		Model:       req.Model,
 		MaxTokens:   req.MaxTokens,
-		Temperature: &req.Temperature,
-		TopP:        &req.TopP,
+		Temperature: &temperature,
+		TopP:        &topP,
 		Stop:        req.Stop,
 	}
 
@@ -238,13 +248,30 @@ func BedrockCreateChatCompletion(req ChatCompletionRequest) (*openai.ChatComplet
 	if err != nil {
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
-	// 转换消息格式
+
+	// 转换消息格式，支持多模态
 	schemaMessages := make([]*schema.Message, len(req.Messages))
 	for i, msg := range req.Messages {
 		role := schema.RoleType(msg.Role)
+		// 普通文本消息
 		schemaMessages[i] = &schema.Message{
 			Role:    role,
 			Content: msg.Content,
+		}
+	}
+
+	// 处理工具调用
+	if req.Tools != nil && len(req.Tools) > 0 {
+		// 转换工具并过滤同名工具
+		tools, err := convertToolInfos(req.Tools)
+		if err != nil {
+			return nil, fmt.Errorf("转换工具信息失败: %v", err)
+		}
+
+		// 绑定工具
+		err = chatModel.BindTools(tools)
+		if err != nil {
+			return nil, fmt.Errorf("绑定工具调用失败: %v", err)
 		}
 	}
 
@@ -290,55 +317,6 @@ func BedrockCreateChatCompletion(req ChatCompletionRequest) (*openai.ChatComplet
 	}, nil
 }
 
-// BedrockCreateChatCompletionToChat 使用AWS Bedrock服务创建聊天完成接口
-func BedrockCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionResponse, error) {
-	// 准备请求参数
-	model := req.Model
-	if model == "" {
-		// 如果没有指定模型，可以设置一个默认值或返回错误
-		return nil, fmt.Errorf("未指定模型名称")
-	}
-
-	temperature := float32(req.Temperature)
-	maxTokens := req.MaxTokens
-
-	// 转换消息格式
-	messages := make([]ChatMessage, 0, len(req.Messages))
-	for _, msg := range req.Messages {
-		messages = append(messages, ChatMessage{
-			Role:    msg.Role,
-			Content: msg.Content,
-		})
-	}
-
-	// 创建Bedrock请求
-	bedrockReq := ChatCompletionRequest{
-		Model:       model,
-		Messages:    messages,
-		Temperature: temperature,
-		MaxTokens:   maxTokens,
-	}
-
-	// 调用Bedrock服务
-	resp, err := BedrockCreateChatCompletion(bedrockReq)
-	if err != nil {
-		return nil, fmt.Errorf("调用Bedrock聊天接口失败: %w", err)
-	}
-
-	return &openai.ChatCompletionResponse{
-		ID:      resp.ID,
-		Object:  resp.Object,
-		Created: resp.Created,
-		Model:   resp.Model,
-		Choices: resp.Choices,
-		Usage: openai.Usage{
-			PromptTokens:     resp.Usage.PromptTokens,
-			CompletionTokens: resp.Usage.CompletionTokens,
-			TotalTokens:      resp.Usage.TotalTokens,
-		},
-	}, nil
-}
-
 // BedrockStreamChatCompletion 使用AWS Bedrock服务创建流式聊天完成
 func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.ChatCompletionStreamResponse], error) {
 	// 创建Bedrock配置
@@ -366,10 +344,11 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
 
-	// 转换消息格式
+	// 转换消息格式，支持多模态
 	schemaMessages := make([]*schema.Message, len(req.Messages))
 	for i, msg := range req.Messages {
 		role := schema.RoleType(msg.Role)
+		// 普通文本消息
 		schemaMessages[i] = &schema.Message{
 			Role:    role,
 			Content: msg.Content,
@@ -383,9 +362,7 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 			return nil, fmt.Errorf("转换工具信息失败: %v", err)
 		}
 
-		fmt.Printf("tools:%+v\n", tools)
-
-		// 绑定
+		// 绑定工具
 		err = chatModel.BindTools(tools)
 		if err != nil {
 			return nil, fmt.Errorf("绑定工具调用失败: %v", err)
@@ -461,6 +438,36 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 	}()
 
 	return resultReader, nil
+}
+
+// 检测MIME类型辅助函数
+func detectMIMEType(urlOrData string) string {
+	// 检查是否是data URL
+	if strings.HasPrefix(urlOrData, "data:") {
+		parts := strings.Split(urlOrData, ";")
+		if len(parts) > 0 {
+			mimeType := strings.TrimPrefix(parts[0], "data:")
+			if mimeType != "" {
+				return mimeType
+			}
+		}
+		// 默认MIME类型
+		return "image/jpeg"
+	}
+
+	// 检查文件扩展名
+	if strings.HasSuffix(urlOrData, ".jpg") || strings.HasSuffix(urlOrData, ".jpeg") {
+		return "image/jpeg"
+	} else if strings.HasSuffix(urlOrData, ".png") {
+		return "image/png"
+	} else if strings.HasSuffix(urlOrData, ".gif") {
+		return "image/gif"
+	} else if strings.HasSuffix(urlOrData, ".webp") {
+		return "image/webp"
+	}
+
+	// 默认MIME类型
+	return "image/jpeg"
 }
 
 // 添加convertToolCalls函数

@@ -64,6 +64,40 @@ func TestBedrockCreateChatCompletion(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "多模态图片输入测试",
+			request: ChatRequest{
+				Provider: "bedrock",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的视觉助手。",
+						},
+						{
+							Role: "user",
+							MultiContent: []openai.ChatMessagePart{
+								{
+									Type: openai.ChatMessagePartTypeText,
+									Text: "What's in this image?",
+								},
+								{
+									Type: openai.ChatMessagePartTypeImageURL,
+									ImageURL: &openai.ChatMessageImageURL{
+										URL:    "data:image/jpeg;base64,/9j/4AAQSkZ...",
+										Detail: openai.ImageURLDetailAuto,
+									},
+								},
+							},
+						},
+					},
+					MaxTokens:   300,
+					Temperature: 0.7,
+					TopP:        1.0,
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -294,21 +328,24 @@ func TestBedrockConfigurationErrors(t *testing.T) {
 			defer os.Rename(tempPath, configPath) // 测试完成后恢复
 
 			// 创建请求
-			req := ChatCompletionRequest{
-				Model: "anthropic.claude-3-opus-20240229",
-				Messages: []ChatMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			req := ChatRequest{
+				Provider: "bedrock",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-opus-20240229",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
 			}
 
 			// 调用函数
-			_, err = BedrockCreateChatCompletion(req)
+			_, err = BedrockCreateChatCompletionToChat(req)
 
 			// 验证错误
 			assert.Error(t, err, "应该返回错误")
