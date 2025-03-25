@@ -1,6 +1,7 @@
 import { appConfigSchema } from '@/config/schema/app';
 import { IpcChannels } from '@/types/ipc/ipc';
 import { ToolbarChannel } from '@/types/ipc/xKey';
+import { TabsProps } from 'antd';
 import { create } from 'zustand';
 
 export interface SettingsState {
@@ -8,6 +9,8 @@ export interface SettingsState {
   schema: Record<string, any>;
   isLoading: boolean;
   error: Error | null;
+  activeTab: string; // 当前激活的标签页
+  tabs: TabsProps['items']; // 配置项的标签页
   // "app.theme": "light" | "dark" | "system";
   // "app.language": "zh-CN" | "en-US";
   // "app.autoUpdate": boolean;
@@ -19,6 +22,8 @@ export interface SettingsState {
   getAll: () => Promise<Record<string, any>>;
   setSetting: (key: string, value: any) => Promise<void>;
   getSetting: (key: string) => any;
+  setTabs: (tabs: TabsProps['items']) => void;
+  setActiveTab: (tab: string) => void;
 }
 
 export const useSettingStore = create<
@@ -30,6 +35,9 @@ export const useSettingStore = create<
   schema: appConfigSchema,
   isLoading: false,
   error: null,
+  activeTab: '',
+  tabs: [],
+
 
   initialize: async () => {
     const settings = await window.ipcRenderer.invoke(IpcChannels.GET_ALL_SETTING_STATE);
@@ -90,5 +98,11 @@ export const useSettingStore = create<
       console.error(`[ConfigReader] 获取配置 "${key}" 失败:`, error);
       return undefined;
     }
+  },
+  setTabs: (tabs: TabsProps['items']) => {
+    set({ tabs });
+  },
+  setActiveTab: (tab: string) => {
+    set({ activeTab: tab });
   },
 }));

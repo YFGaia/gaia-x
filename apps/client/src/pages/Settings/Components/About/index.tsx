@@ -21,7 +21,7 @@ const About = () => {
   }, []);
 
   return (
-    <div>
+    <div className='flex flex-col gap-2 px-4'>
       <h3>使用说明</h3>
       <p>{'聊天框，自带划词弹出工具条，可以指定智能体发送选中的文本'}</p>
       <div className="version-info" style={{ margin: '10px 0', color: '#666' }}>

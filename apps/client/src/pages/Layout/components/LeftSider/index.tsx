@@ -1,9 +1,12 @@
 import ChatMenu from "@/pages/Chat/components/ChatMenu";
 import PluginsMenu from "@/pages/Plugins/components/Menu";
+import { SettingsRouter } from "@/pages/Settings/Components/SettingView";
 import { Tabs, TabsProps } from "antd";
 import { createStyles } from "antd-style";
-import { VscExtensions, VscOctoface, VscComment, VscSettings, VscSettingsGear  } from "react-icons/vsc";
-
+import { VscExtensions, VscOctoface, VscSettings, VscSettingsGear  } from "react-icons/vsc";
+import { RiHistoryFill } from "react-icons/ri";
+import { useViewStore } from "@/stores/ViewStore";
+import { useCallback } from "react";
 const useStyle = createStyles(({ token, css }) => {
   return {
     leftContent: css`
@@ -46,17 +49,18 @@ const TabLabel = ({ icon }: { icon: React.ReactNode }) => {
 
 const LeftSider: React.FC = () => {
   const { styles } = useStyle();
+  const { setView } = useViewStore();
 
   const tabItems: TabsProps['items'] = [
     {
       key: 'chat',
-      label: <TabLabel icon={<VscComment fontSize={16}/>} />,
+      label: <TabLabel icon={<RiHistoryFill fontSize={16}/>} />,
       children: <ChatMenu />
     },
     {
-      key: 'agent',
+      key: 'mcp',
       label: <TabLabel icon={<VscOctoface fontSize={16}/>} />,
-      children: <div>Agents</div>
+      children: <div>MCP</div>
     },
     {
       key: 'plugin',
@@ -66,14 +70,27 @@ const LeftSider: React.FC = () => {
     {
       key: 'settings',
       label: <TabLabel icon={<VscSettingsGear fontSize={16}/>} />,
-      children: <div>Settings</div>
+      children: <SettingsRouter />
     },
   ]
+
+  const handleChange = useCallback((key: string) => {
+    console.log('key', key);
+    if (key === 'chat') {
+      setView('chat');
+    } else if (key === 'settings') {
+      setView('setting');
+    } else if (key === 'mcp') {
+      setView('mcp');
+    } else if (key === 'plugin') {
+      setView('extension');
+    }
+  }, []);
 
   // 由于扩展功能还没上线，所以先隐藏
   return (
     <div className={styles.leftContent}>
-      <Tabs items={tabItems} className={styles.tabs} more={moreProps} />
+      <Tabs items={tabItems} className={styles.tabs} more={moreProps} onChange={handleChange} />
     </div>
   )
 }
