@@ -402,7 +402,7 @@ export class DarwinRuntime extends PlatformRuntime {
 
   getVenvPythonPath(envName: string): string {
     const envPath = this.getIsolatedEnvPath(envName);
-    return path.join(envPath, 'bin', 'python3');
+    return path.join(envPath, '.venv', 'bin', 'python3');
   }
   
   /**
