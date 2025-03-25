@@ -34,3 +34,6 @@ yarn.lock
 
 .vite-cache
 mockServiceWorker.js
+
+#eino-x秘钥相关文件
+apps/admin/server/data/einox/
