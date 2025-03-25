@@ -9,7 +9,7 @@ import { PlatformRuntime } from './platformRuntime';
 
 export class Win32Runtime extends PlatformRuntime {
   // 读取环境变量VITE_BIN_WINDOWS_DOWNLOAD_PATH
-  downUrl = process.env.VITE_BIN_WINDOWS_DOWNLOAD_PATH || '';
+  downUrl = import.meta.env.VITE_BIN_WINDOWS_DOWNLOAD_PATH || '';
 
   async installRuntime() {
     try {
@@ -20,7 +20,7 @@ export class Win32Runtime extends PlatformRuntime {
         console.log('Python、Node运行时已安装');
         return;
       }
-
+      console.log("downUrl", this.downUrl);
       // 下载并解压Python
       await downloadAndExtract(this.downUrl, runtimePath);
 
