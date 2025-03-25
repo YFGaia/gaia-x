@@ -12,6 +12,14 @@
   border-bottom: 1px solid var(--gxk-border-color-secondary);
 }
 
+@media (max-width: 600px) {
+  .preset-editor-header{
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}
+
 .preset-list-actions {
   display: flex;
   gap: 8px;

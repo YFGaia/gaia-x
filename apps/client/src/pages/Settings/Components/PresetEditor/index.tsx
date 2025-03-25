@@ -190,7 +190,7 @@ export default function PresetEditor() {
   };
 
   return (
-    <div className="preset-editor min-w-[500px]">
+    <div className="preset-editor">
       {/* Action buttons */}
       <div className="preset-editor-header">
         <div>编辑工具条预设，拖动调整顺序</div>
