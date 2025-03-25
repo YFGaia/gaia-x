@@ -21,6 +21,12 @@ const useStyle = createStyles(({ token, css }) => {
       display: flex;
       height: calc(100vh - 126px);
       overflow-y: auto;
+      .ant-conversations-item {
+        span {
+          /* 折叠历史记录时避免因为自动换行导致布局抖动 */
+          text-wrap: nowrap;
+        }
+      }
     `,
     logo: css`
       display: flex;
