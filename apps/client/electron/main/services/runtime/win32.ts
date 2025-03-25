@@ -8,7 +8,8 @@ import { downloadAndExtract } from '~/main/utils/common';
 import { PlatformRuntime } from './platformRuntime';
 
 export class Win32Runtime extends PlatformRuntime {
-  downUrl = '';
+  // 读取环境变量VITE_BIN_WINDOWS_DOWNLOAD_PATH
+  downUrl = process.env.VITE_BIN_WINDOWS_DOWNLOAD_PATH || '';
 
   async installRuntime() {
     try {

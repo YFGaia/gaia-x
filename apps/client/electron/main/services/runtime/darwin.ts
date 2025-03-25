@@ -12,7 +12,8 @@ import { getOriginalEnv} from '~/main/index'
  * 目前使用在线下载官方包的方式，后续使用自建包的方式
  */
 export class DarwinRuntime extends PlatformRuntime {
-  downUrl = '';
+  // 读取环境变量VITE_BIN_MAC_DOWNLOAD_PATH
+  downUrl = process.env.VITE_BIN_MAC_DOWNLOAD_PATH || '';
   downPythonUrl =
     'https://github.com/indygreg/python-build-standalone/releases/download/20250212/cpython-3.13.2+20250212-aarch64-apple-darwin-install_only.tar.gz';
   downNodeUrl = 'https://nodejs.org/download/release/v22.11.0/node-v22.11.0-darwin-arm64.tar.gz';
