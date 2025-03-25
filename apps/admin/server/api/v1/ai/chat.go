@@ -3,10 +3,9 @@ package ai
 import (
 	"net/http"
 
-	einox "github.com/gaia-x/eino-x"
-
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	einox "github.com/gaia-x/eino-x"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
