@@ -215,107 +215,6 @@ func (c *Config) getBedrockConfig() (*claude.Config, error) {
 	return claudeConf, nil
 }
 
-// convertChatRequestToSchemaMessages 将ChatRequest中的消息转换为schema.Message格式
-func convertChatRequestToSchemaMessages(req ChatRequest) []*schema.Message {
-	schemaMessages := make([]*schema.Message, len(req.Messages))
-	for i, msg := range req.Messages {
-		// 创建基本消息结构
-		schemaMsg := &schema.Message{
-			Role:       schema.RoleType(msg.Role),
-			Name:       msg.Name,
-			ToolCallID: msg.ToolCallID,
-		}
-
-		// 处理内容 - 根据是否有多模态内容决定使用Content还是MultiContent
-		if len(msg.MultiContent) > 0 {
-			// 处理多模态内容
-			multiContent := make([]schema.ChatMessagePart, len(msg.MultiContent))
-			for j, part := range msg.MultiContent {
-				chatPart := schema.ChatMessagePart{
-					Type: schema.ChatMessagePartType(part.Type),
-					Text: part.Text,
-				}
-
-				// 处理不同类型的媒体URL
-				switch chatPart.Type {
-				case schema.ChatMessagePartTypeImageURL:
-					// 处理图片URL
-					if part.ImageURL != nil {
-						// 判断是否为URL格式，如果是则转换为BASE64
-						if isURL(part.ImageURL.URL) {
-							// 转换图片URL为BASE64
-							base64Data, mimeType, err := convertImageURLToBase64(part.ImageURL.URL)
-							if err != nil {
-								// 记录错误但继续使用原URL
-								fmt.Printf("转换图片URL到BASE64失败: %v\n", err)
-							} else {
-								// 使用转换后的BASE64数据
-								part.ImageURL.URL = base64Data
-								chatPart.ImageURL = &schema.ChatMessageImageURL{
-									URL:      base64Data,
-									Detail:   schema.ImageURLDetail(part.ImageURL.Detail),
-									MIMEType: mimeType,
-								}
-							}
-						} else {
-							// 默认处理方式，可能已经是BASE64数据
-							chatPart.ImageURL = &schema.ChatMessageImageURL{
-								URL:      part.ImageURL.URL,
-								Detail:   schema.ImageURLDetail(part.ImageURL.Detail),
-								MIMEType: detectMIMEType(part.ImageURL.URL),
-							}
-						}
-					}
-				case schema.ChatMessagePartTypeAudioURL:
-					// 处理音频URL (如果API支持)
-					// 注意：目前go-openai未定义AudioURL等字段
-					// 未来API支持后需要更新此处实现
-					if part.ImageURL != nil { // 临时使用ImageURL字段
-						chatPart.AudioURL = &schema.ChatMessageAudioURL{
-							URL:      part.ImageURL.URL,
-							MIMEType: "audio/mp3", // 默认MIME类型
-						}
-					}
-				case schema.ChatMessagePartTypeVideoURL:
-					// 处理视频URL (如果API支持)
-					if part.ImageURL != nil { // 临时使用ImageURL字段
-						chatPart.VideoURL = &schema.ChatMessageVideoURL{
-							URL:      part.ImageURL.URL,
-							MIMEType: "video/mp4", // 默认MIME类型
-						}
-					}
-				case schema.ChatMessagePartTypeFileURL:
-					// 处理文件URL (如果API支持)
-					if part.ImageURL != nil { // 临时使用ImageURL字段
-						chatPart.FileURL = &schema.ChatMessageFileURL{
-							URL:      part.ImageURL.URL,
-							MIMEType: "application/pdf", // 默认MIME类型
-							//TODO 待完善
-							Name: "file.pdf", // 默认文件名
-						}
-					}
-				}
-
-				multiContent[j] = chatPart
-			}
-			schemaMsg.MultiContent = multiContent
-		} else {
-			// 使用普通文本内容
-			schemaMsg.Content = msg.Content
-		}
-
-		// 如果存在额外数据，添加到Extra字段 TODO 待完善
-		if req.Extra != nil && len(req.Extra) > 0 {
-			schemaMsg.Extra = req.Extra
-		}
-
-		// 保存转换后的消息
-		schemaMessages[i] = schemaMsg
-	}
-
-	return schemaMessages
-}
-
 // BedrockCreateChatCompletion 使用AWS Bedrock服务创建聊天完成
 func BedrockCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionResponse, error) {
 	// 准备请求参数
@@ -525,36 +424,6 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 	}()
 
 	return resultReader, nil
-}
-
-// 检测MIME类型辅助函数
-func detectMIMEType(urlOrData string) string {
-	// 检查是否是data URL
-	if strings.HasPrefix(urlOrData, "data:") {
-		parts := strings.Split(urlOrData, ";")
-		if len(parts) > 0 {
-			mimeType := strings.TrimPrefix(parts[0], "data:")
-			if mimeType != "" {
-				return mimeType
-			}
-		}
-		// 默认MIME类型
-		return "image/jpeg"
-	}
-
-	// 检查文件扩展名
-	if strings.HasSuffix(urlOrData, ".jpg") || strings.HasSuffix(urlOrData, ".jpeg") {
-		return "image/jpeg"
-	} else if strings.HasSuffix(urlOrData, ".png") {
-		return "image/png"
-	} else if strings.HasSuffix(urlOrData, ".gif") {
-		return "image/gif"
-	} else if strings.HasSuffix(urlOrData, ".webp") {
-		return "image/webp"
-	}
-
-	// 默认MIME类型
-	return "image/jpeg"
 }
 
 // 添加convertToolCalls函数
@@ -780,14 +649,8 @@ func convertImageURLToBase64(imageURL string) (string, string, error) {
 	return base64Data, mimeType, nil
 }
 
-// isURL 判断字符串是否为URL格式
+// isURL 判断字符串是否是URL
 func isURL(str string) bool {
-	// 检查是否已经是data URL格式
-	if strings.HasPrefix(str, "data:") {
-		return false
-	}
-
-	// 尝试解析URL
-	u, err := url.Parse(str)
-	return err == nil && u.Scheme != "" && u.Host != ""
+	// 简单的URL判断逻辑
+	return strings.HasPrefix(str, "http://") || strings.HasPrefix(str, "https://")
 }
