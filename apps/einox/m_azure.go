@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/sashabaranov/go-openai"
 	"io"
 	"math/rand"
 	"net/http"
@@ -29,6 +28,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/sashabaranov/go-openai"
 
 	einoopenai "github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/schema"
@@ -195,7 +196,7 @@ func (c *Config) getAzureConfig() (*einoopenai.ChatModelConfig, error) {
 }
 
 // AzureCreateChatCompletion 使用Azure OpenAI服务创建聊天完成
-func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCompletionResponse, error) {
+func AzureCreateChatCompletion(req ChatRequest) (*openai.ChatCompletionResponse, error) {
 	// 创建Azure OpenAI配置
 	conf := &Config{
 		Vendor:      "azure",
@@ -221,15 +222,8 @@ func AzureCreateChatCompletion(req openai.ChatCompletionRequest) (*openai.ChatCo
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
 
-	// 转换消息格式
-	schemaMessages := make([]*schema.Message, len(req.Messages))
-	for i, msg := range req.Messages {
-		role := schema.RoleType(msg.Role)
-		schemaMessages[i] = &schema.Message{
-			Role:    role,
-			Content: msg.Content,
-		}
-	}
+	// 转换消息格式，使用通用方法
+	schemaMessages := convertChatRequestToSchemaMessages(req)
 
 	// 调用Generate方法获取响应
 	resp, err := chatModel.Generate(ctx, schemaMessages)
@@ -282,16 +276,8 @@ func AzureCreateChatCompletionToChat(req ChatRequest) (*openai.ChatCompletionRes
 		return nil, fmt.Errorf("未指定模型名称")
 	}
 
-	// 创建Azure请求
-	azureReq := openai.ChatCompletionRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-	}
-
 	// 调用Azure服务
-	resp, err := AzureCreateChatCompletion(azureReq)
+	resp, err := AzureCreateChatCompletion(req)
 	if err != nil {
 		return nil, fmt.Errorf("调用Azure聊天接口失败: %w", err)
 	}
@@ -337,15 +323,8 @@ func AzureStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.Ch
 		return nil, fmt.Errorf("创建聊天模型失败: %v", err)
 	}
 
-	// 转换消息格式
-	schemaMessages := make([]*schema.Message, len(req.Messages))
-	for i, msg := range req.Messages {
-		role := schema.RoleType(msg.Role)
-		schemaMessages[i] = &schema.Message{
-			Role:    role,
-			Content: msg.Content,
-		}
-	}
+	// 转换消息格式，使用通用方法
+	schemaMessages := convertChatRequestToSchemaMessages(req)
 
 	// 调用Stream方法获取流式响应
 	streamReader, err := chatModel.Stream(ctx, schemaMessages)

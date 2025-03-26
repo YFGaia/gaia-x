@@ -42,185 +42,215 @@ func TestAzureCreateChatCompletion(t *testing.T) {
 	// 准备测试用例
 	testCases := []struct {
 		name           string
-		request        openai.ChatCompletionRequest
+		request        ChatRequest
 		expectedError  bool
 		errorContains  string
 		skipOnAPIError bool
 	}{
 		{
 			name: "基本聊天完成测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "system",
-						Content: "你是一个有帮助的助手。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个有帮助的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "你好，请介绍一下自己。",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "你好，请介绍一下自己。",
-					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "使用不同模型的测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-4",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "system",
-						Content: "你是一个专业的编程助手。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-4",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个专业的编程助手。",
+						},
+						{
+							Role:    "user",
+							Content: "解释什么是递归函数？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "解释什么是递归函数？",
-					},
+					MaxTokens:   150,
+					Temperature: 0.5,
+					TopP:        0.9,
 				},
-				MaxTokens:   150,
-				Temperature: 0.5,
-				TopP:        0.9,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "0温度测试(确定性输出)",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "计算2+2等于几？请只回答数字。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "计算2+2等于几？请只回答数字。",
+						},
 					},
+					MaxTokens:   10,
+					Temperature: 0.0,
+					TopP:        1.0,
 				},
-				MaxTokens:   10,
-				Temperature: 0.0,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "最大温度测试(最大随机性)",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "给我讲一个短故事。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "给我讲一个短故事。",
+						},
 					},
+					MaxTokens:   200,
+					Temperature: 2.0,
+					TopP:        1.0,
 				},
-				MaxTokens:   200,
-				Temperature: 2.0,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "最小TopP测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "什么是人工智能？",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "什么是人工智能？",
+						},
 					},
+					MaxTokens:   150,
+					Temperature: 0.7,
+					TopP:        0.1, // 非常确定性的输出
 				},
-				MaxTokens:   150,
-				Temperature: 0.7,
-				TopP:        0.1, // 非常确定性的输出
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "消息链测试(多轮对话)",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "system",
-						Content: "你是一个友好的助手。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "system",
+							Content: "你是一个友好的助手。",
+						},
+						{
+							Role:    "user",
+							Content: "你好！",
+						},
+						{
+							Role:    "assistant",
+							Content: "你好！有什么我可以帮助你的吗？",
+						},
+						{
+							Role:    "user",
+							Content: "今天天气怎么样？",
+						},
 					},
-					{
-						Role:    "user",
-						Content: "你好！",
-					},
-					{
-						Role:    "assistant",
-						Content: "你好！有什么我可以帮助你的吗？",
-					},
-					{
-						Role:    "user",
-						Content: "今天天气怎么样？",
-					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "停止序列测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "列出1到10的数字。",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "列出1到10的数字。",
+						},
 					},
+					MaxTokens:   100,
+					Temperature: 0.7,
+					TopP:        1.0,
+					Stop:        []string{"5", "，5", ", 5"}, // 在数到5时停止
 				},
-				MaxTokens:   100,
-				Temperature: 0.7,
-				TopP:        1.0,
-				Stop:        []string{"5", "，5", ", 5"}, // 在数到5时停止
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "极小令牌测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   1, // 只生成一个token
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   1, // 只生成一个token
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "空消息列表测试",
-			request: openai.ChatCompletionRequest{
-				Model:       "gpt-3.5-turbo",
-				Messages:    []openai.ChatCompletionMessage{},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model:       "gpt-3.5-turbo",
+					Messages:    []openai.ChatCompletionMessage{},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
+				},
 			},
 			expectedError: true,
 			errorContains: "消息",
 		},
 		{
 			name: "无效模型名称测试",
-			request: openai.ChatCompletionRequest{
-				Model: "invalid-model-name",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "invalid-model-name",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			expectedError: true,
 			errorContains: "model",
@@ -254,7 +284,7 @@ func TestAzureCreateChatCompletion(t *testing.T) {
 			assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 			assert.Equal(t, "chat.completion", resp.Object, "响应对象类型应为chat.completion")
 			assert.NotZero(t, resp.Created, "创建时间不应为零")
-			assert.Equal(t, tc.request.Model, resp.Model, "响应模型应与请求模型匹配")
+			assert.Equal(t, tc.request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 			assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 			// 验证Usage字段
@@ -423,17 +453,20 @@ func TestAzureConfigurationErrors(t *testing.T) {
 		}
 
 		// 测试请求
-		req := openai.ChatCompletionRequest{
-			Model: "gpt-3.5-turbo",
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    "user",
-					Content: "你好",
+		req := ChatRequest{
+			Provider: "azure",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model: "gpt-3.5-turbo",
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好",
+					},
 				},
+				MaxTokens:   50,
+				Temperature: 0.7,
+				TopP:        1.0,
 			},
-			MaxTokens:   50,
-			Temperature: 0.7,
-			TopP:        1.0,
 		}
 
 		// 调用被测试的函数
@@ -470,17 +503,20 @@ environments:
 		}
 
 		// 测试请求
-		req := openai.ChatCompletionRequest{
-			Model: "gpt-3.5-turbo",
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    "user",
-					Content: "你好",
+		req := ChatRequest{
+			Provider: "azure",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model: "gpt-3.5-turbo",
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好",
+					},
 				},
+				MaxTokens:   50,
+				Temperature: 0.7,
+				TopP:        1.0,
 			},
-			MaxTokens:   50,
-			Temperature: 0.7,
-			TopP:        1.0,
 		}
 
 		// 调用被测试的函数
@@ -528,17 +564,20 @@ environments:
 		defer os.Unsetenv("ENV")
 
 		// 测试请求
-		req := openai.ChatCompletionRequest{
-			Model: "gpt-3.5-turbo",
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    "user",
-					Content: "你好",
+		req := ChatRequest{
+			Provider: "azure",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model: "gpt-3.5-turbo",
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好",
+					},
 				},
+				MaxTokens:   50,
+				Temperature: 0.7,
+				TopP:        1.0,
 			},
-			MaxTokens:   50,
-			Temperature: 0.7,
-			TopP:        1.0,
 		}
 
 		// 调用被测试的函数
@@ -582,17 +621,20 @@ environments:
 		}
 
 		// 测试请求
-		req := openai.ChatCompletionRequest{
-			Model: "gpt-3.5-turbo",
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    "user",
-					Content: "你好",
+		req := ChatRequest{
+			Provider: "azure",
+			ChatCompletionRequest: openai.ChatCompletionRequest{
+				Model: "gpt-3.5-turbo",
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: "你好",
+					},
 				},
+				MaxTokens:   50,
+				Temperature: 0.7,
+				TopP:        1.0,
 			},
-			MaxTokens:   50,
-			Temperature: 0.7,
-			TopP:        1.0,
 		}
 
 		// 调用被测试的函数
@@ -614,101 +656,119 @@ func TestAzureCreateChatCompletionEdgeCases(t *testing.T) {
 	// 准备测试用例
 	testCases := []struct {
 		name           string
-		request        openai.ChatCompletionRequest
+		request        ChatRequest
 		expectedError  bool
 		errorContains  string
 		skipOnAPIError bool
 	}{
 		{
 			name: "空模型名称测试",
-			request: openai.ChatCompletionRequest{
-				Model: "",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			expectedError: true,
 			errorContains: "model",
 		},
 		{
 			name: "极大温度测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 10.0, // 远超正常范围
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 10.0, // 远超正常范围
-				TopP:        1.0,
 			},
 			skipOnAPIError: true, // API可能接受这个值但会自动限制
 		},
 		{
 			name: "极小TopP测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        0.0000001, // 近似为0
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        0.0000001, // 近似为0
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "负数MaxTokens测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: "你好",
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: "你好",
+						},
 					},
+					MaxTokens:   -10, // 负数标记
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   -10, // 负数标记
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			expectedError: true,
 			errorContains: "token",
 		},
 		{
 			name: "非常长的文本测试",
-			request: openai.ChatCompletionRequest{
-				Model: "gpt-3.5-turbo",
-				Messages: []openai.ChatCompletionMessage{
-					{
-						Role:    "user",
-						Content: strings.Repeat("这是一个非常长的文本测试。", 100), // 重复100次的长文本
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "gpt-3.5-turbo",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role:    "user",
+							Content: strings.Repeat("这是一个非常长的文本测试。", 100), // 重复100次的长文本
+						},
 					},
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
 				},
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
 			},
 			skipOnAPIError: true,
 		},
 		{
 			name: "超多消息测试",
-			request: openai.ChatCompletionRequest{
-				Model:       "gpt-3.5-turbo",
-				Messages:    generateLongMessageChain(50), // 生成50条消息的链
-				MaxTokens:   50,
-				Temperature: 0.7,
-				TopP:        1.0,
+			request: ChatRequest{
+				Provider: "azure",
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model:       "gpt-3.5-turbo",
+					Messages:    generateLongMessageChain(50), // 生成50条消息的链
+					MaxTokens:   50,
+					Temperature: 0.7,
+					TopP:        1.0,
+				},
 			},
 			skipOnAPIError: true,
 		},
@@ -741,7 +801,7 @@ func TestAzureCreateChatCompletionEdgeCases(t *testing.T) {
 			assert.NotEmpty(t, resp.ID, "响应ID不应为空")
 			assert.Equal(t, "chat.completion", resp.Object, "响应对象类型应为chat.completion")
 			assert.NotZero(t, resp.Created, "创建时间不应为零")
-			assert.Equal(t, tc.request.Model, resp.Model, "响应模型应与请求模型匹配")
+			assert.Equal(t, tc.request.ChatCompletionRequest.Model, resp.Model, "响应模型应与请求模型匹配")
 			assert.NotEmpty(t, resp.Choices, "选择不应为空")
 
 			if len(resp.Choices) > 0 {
