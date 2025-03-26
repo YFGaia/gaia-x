@@ -40,3 +40,6 @@ web/pnpm-lock.yaml
 *.db
 *.sqlite
 *.sqlite3
+
+# 忽略gva_web
+gva_web/
