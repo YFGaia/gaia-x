@@ -75,7 +75,7 @@ func TestAzureCreateChatCompletion(t *testing.T) {
 			request: ChatRequest{
 				Provider: "azure",
 				ChatCompletionRequest: openai.ChatCompletionRequest{
-					Model: "gpt-4",
+					Model: "gpt-4o",
 					Messages: []openai.ChatCompletionMessage{
 						{
 							Role:    "system",
