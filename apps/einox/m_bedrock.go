@@ -506,7 +506,7 @@ func BedrockStreamChatCompletion(req ChatRequest) (*schema.StreamReader[*openai.
 							Content:   message.Content,
 							ToolCalls: convertToolCalls(message.ToolCalls),
 						},
-						FinishReason: "stop",
+						FinishReason: "",
 					},
 				},
 			}
