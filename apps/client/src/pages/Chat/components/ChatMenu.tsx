@@ -10,6 +10,7 @@ import { AiOutlineDelete, AiOutlineForm } from 'react-icons/ai';
 const useStyle = createStyles(({ token, css }) => {
   return {
     menu: css`
+      margin-top: 12px;
       width: 100%;
       height: 100%;
       flex-direction: column;
@@ -21,6 +22,12 @@ const useStyle = createStyles(({ token, css }) => {
       display: flex;
       height: calc(100vh - 126px);
       overflow-y: auto;
+      .ant-conversations-item {
+        span {
+          /* 折叠历史记录时避免因为自动换行导致布局抖动 */
+          text-wrap: nowrap;
+        }
+      }
     `,
     logo: css`
       display: flex;
@@ -118,18 +125,21 @@ const ChatMenu: React.FC = () => {
       <div className={styles.menu}>
         {/* 🌟 添加会话 */}
         <div className={styles.btns}>
-          <Button
+          {/* <Button
             size="large"
             icon={<AiOutlineDelete fontSize={20} />}
             type="text"
             onClick={confirmRemoveConversation}
-          ></Button>
+          ></Button> */}
           <Button
             size="large"
+            color="default"
             onClick={newConversation}
-            icon={<AiOutlineForm fontSize={20} />}
-            type="text"
-          ></Button>
+            variant="filled"
+            style={{
+              width: "100%",
+            }}
+          >新建聊天</Button>
         </div>
         {/* 🌟 会话管理 */}
         <Conversations

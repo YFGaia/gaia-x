@@ -24,7 +24,9 @@ export const Logo: React.FC<LogoProps> = ({
             className={className}
             style={{
                 ...sizeValues[size],
-                filter: 'drop-shadow(0 0 1px white)'
+                filter: 'drop-shadow(0 0 2px white)',
+                userSelect: 'none',
+                pointerEvents: 'none'
             }} 
         />
     )

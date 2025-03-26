@@ -1,14 +1,40 @@
 import { useSettingStore } from '@/stores/SettingStore';
-import { Tabs, TabsProps } from 'antd';
 import SettingItem from './SettingItem';
 import UserProfile from './UserProfile';
 import PresetEditor from '@/pages/Settings/Components/PresetEditor';
 import About from './About';
-import McpService from './McpService';
+import { useEffect } from 'react';
+import { createStyles } from "antd-style";
 
-const SettingView: React.FC = () => {
+const useStyle = createStyles(({ token, css }) => {
+  return {
+    tabContainer: css`
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    `,
+    tabItem: css`
+      cursor: pointer;
+      padding: 8px 16px;
+      &:hover {
+        background-color: ${token.colorBgTextHover};
+      }
+      &[aria-selected="true"] {
+        background-color: ${token.colorPrimary};
+        color: ${token.colorTextLightSolid};
+        font-weight: 500;
+      }
+    `,
+  }
+})
+
+
+export const SettingsRouter = () => {
+  const { tabs, activeTab, setActiveTab, setTabs } = useSettingStore();
   const { settings, schema } = useSettingStore();
   console.log(settings, schema);
+  const { styles } = useStyle();
 
   // 获取配置里所有键以key开头的值的列表
   const getSettingItem = (key: string):Record<string, any> => {
@@ -20,43 +46,57 @@ const SettingView: React.FC = () => {
     })
     return res
   }
+  useEffect(() => {
+    setTabs([
+      ...Object.entries(schema).map(([key, value]) => {
+        return {
+          key: key,
+          label: value.title,
+          children: <SettingItem schema={value.properties} settings={getSettingItem(key)}/>
+        }
+      }),
+      {
+        key: 'chatPreset',
+        label: '对话预设',
+        children: <PresetEditor />
+      },
+      {
+        key: 'userInfo',
+        label: '个人信息',
+        children: <UserProfile />
+      },
+      {
+        key: 'about',
+        label: '关于',
+        children: <About />
+      }
+    ])
+    setActiveTab('userInfo')
+  }, [])
 
-  const tabs: TabsProps['items'] = []
+  return (
+    <div className={styles.tabContainer}>
+      {tabs && tabs.map((tab) => (
+        <div 
+          key={tab.key} 
+          onClick={() => setActiveTab(tab.key)}
+          aria-selected={activeTab === tab.key}
+          className={styles.tabItem}
+        >
+          {tab.label}
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  tabs.push({
-    key: 'userInfo',
-    label: '个人信息',
-    children: <UserProfile />
-  })
-
-  Object.entries(schema).map(([key, value]) => {
-    tabs.push({
-      key: key,
-      label: value.title,
-      children: <SettingItem schema={value.properties} settings={getSettingItem(key)}/>
-    })
-  })
-
-  tabs.push({
-    key: 'chatPreset',
-    label: '对话预设',
-    children: <PresetEditor />
-  })
-
-  tabs.push({
-    key: 'mcpService',
-    label: 'MCP服务',
-    children: <McpService />
-  })
-
-  tabs.push({
-    key: 'about',
-    label: '关于',
-    children: <About />
-  })
-
-
-  return <Tabs tabPosition='left' className='pr-6 h-full pt-6 select-none' items={tabs} />;
+const SettingView: React.FC = () => {
+  const { tabs, activeTab } = useSettingStore();
+  return (
+    <div className="p-4">
+      {tabs && tabs.find((tab) => tab.key === activeTab)?.children}
+    </div>
+  )
 };
 
 export default SettingView;

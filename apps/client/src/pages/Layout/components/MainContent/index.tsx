@@ -1,6 +1,7 @@
 import ChatView from '@/pages/Chat/components/ChatView';
 import ExtensionDetail from '@/pages/Extension/components/ExtensionDetail';
 import SettingView from '@/pages/Settings/Components/SettingView';
+import McpView from '@/pages/Settings/Components/McpView';
 import { useViewStore } from '@/stores/ViewStore';
 import { useEffect } from 'react';
 import { SettingChannel } from '@/types/ipc/xKey';
@@ -15,10 +16,11 @@ const MainContent: React.FC = () => {
     }
   }, [toolbarEnabled]);
   return (
-    <div className="mainContent h-full">
+    <div className="mainContent h-full bg-white dark:bg-[#141414]">
       {currentView === 'chat' && <ChatView params={viewParams} />}
-      {currentView === 'setting' && <SettingView />}
+      {currentView === 'mcp' && <McpView />}
       {currentView === 'extension' && <ExtensionDetail />}
+      {currentView === 'setting' && <SettingView />}
     </div>
   );
 };
