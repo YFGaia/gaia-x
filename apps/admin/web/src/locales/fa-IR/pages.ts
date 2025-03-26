@@ -1,5 +1,5 @@
 export default {
-  'pages.layouts.userLayout.title': 'طراحی مورچه تأثیرگذارترین مشخصات طراحی وب در منطقه Xihu است',
+  'pages.layouts.userLayout.title': 'Go Al with Gaia, Accelerate to Win',
   'pages.login.accountLogin.tab': 'ورود به حساب کاربری',
   'pages.login.accountLogin.errorMessage': 'نام کاربری / رمزعبور نادرست (مدیر / ant.design)',
   'pages.login.failure': 'ورود به سیستم با شکست مواجه شد، لطفا دوباره سعی کنید!',

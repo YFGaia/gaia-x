@@ -1,5 +1,5 @@
 export default {
-  'pages.layouts.userLayout.title': 'Ant Design 是西湖區最具影響力的 Web 設計規範',
+  'pages.layouts.userLayout.title': '企業AI賦能，蓋亞加速贏',
   'pages.login.accountLogin.tab': '賬戶密碼登錄',
   'pages.login.accountLogin.errorMessage': '錯誤的用戶名和密碼(admin/ant.design)',
   'pages.login.failure': '登錄失敗，請重試！',
