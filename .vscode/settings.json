@@ -33,6 +33,7 @@
     "apps/client/release": true,
     "apps/client/dist-electron": true,
     "apps/client/dist": true,
+    "apps/client/.vite-cache": true
   },
   "files.exclude": {
     "**/.git": true,
