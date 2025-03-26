@@ -150,7 +150,7 @@ export class mcpToolHandler {
       
       const { command, args, env } = resolvedCommand;
 
-      console.log('解析命令', command, args, env);
+      console.log('解析命令', command, args);
 
       // 应用平台特定的命令处理
       const platformSpecific = this.getPlatformSpecificCommand(command, args, env);
@@ -158,7 +158,7 @@ export class mcpToolHandler {
       const platformArgs = platformSpecific.args;
       const platformEnv = platformSpecific.env;
 
-      console.log('平台特定命令', platformCommand, platformArgs,platformEnv);
+      console.log('平台特定命令', platformCommand, platformArgs);
 
       
       // 使用隔离环境创建transport
