@@ -23,6 +23,7 @@ import (
 	"github.com/gaia-x/eino-x"
 )
 
+// 执行命令行示例: go run cmd/encrypt/main.go "要加密的字符串"
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("使用方法: encrypt <要加密的字符串>")
@@ -30,6 +31,10 @@ func main() {
 	}
 
 	keyToEncrypt := os.Args[1]
+
+	//打印加密前字符
+	fmt.Printf("加密前字符: %s\n", keyToEncrypt)
+
 	// 初始化RSA密钥管理器
 	encryptFunc, _, err := einox.InitRSAKeyManager()
 	if err != nil {

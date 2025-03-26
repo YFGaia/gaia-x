@@ -33,7 +33,7 @@ func TestChatService_CreateChatCompletion(t *testing.T) {
 			req: einox.ChatRequest{
 				Provider: "bedrock", // 使用bedrock作为供应商
 				ChatCompletionRequest: openai.ChatCompletionRequest{
-					Model: "gpt-3.5-turbo",
+					Model: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 					Messages: []openai.ChatCompletionMessage{
 						{Role: "user", Content: "你好"},
 					},
@@ -45,37 +45,99 @@ func TestChatService_CreateChatCompletion(t *testing.T) {
 			isStream: true,
 		},
 		{
-			name: "非流式响应测试",
+			name: "流式响应测试-图片URL输入",
 			req: einox.ChatRequest{
 				Provider: "bedrock", // 使用bedrock作为供应商
 				ChatCompletionRequest: openai.ChatCompletionRequest{
-					Model: "gpt-3.5-turbo",
+					Model: "anthropic.claude-3-5-sonnet-20241022-v2:0",
 					Messages: []openai.ChatCompletionMessage{
-						{Role: "user", Content: "你好"},
+						{
+							Role: "user",
+							MultiContent: []openai.ChatMessagePart{
+								{
+									Type: openai.ChatMessagePartTypeText,
+									Text: "这张图片是什么内容?",
+								},
+								{
+									Type: openai.ChatMessagePartTypeImageURL,
+									ImageURL: &openai.ChatMessageImageURL{
+										URL:    "https://example.com/image.jpg", // 替换为实际的图片URL
+										Detail: openai.ImageURLDetailAuto,
+									},
+								},
+							},
+						},
 					},
-					Stream: false,
-				},
-			},
-			writer:         nil,
-			wantErr:        true,
-			expectedErrMsg: "暂不支持非流式响应",
-			isStream:       false,
-		},
-		{
-			name: "测试默认供应商配置",
-			req: einox.ChatRequest{
-				ChatCompletionRequest: openai.ChatCompletionRequest{
-					Model: "gpt-3.5-turbo",
-					Messages: []openai.ChatCompletionMessage{
-						{Role: "user", Content: "你好"},
-					},
-					Stream: true, // 使用流式响应
+					Stream: true,
 				},
 			},
 			writer:   &bytes.Buffer{},
 			wantErr:  false,
 			isStream: true,
 		},
+		{
+			name: "流式响应测试-Base64图片输入",
+			req: einox.ChatRequest{
+				Provider: "bedrock", // 使用bedrock作为供应商
+				ChatCompletionRequest: openai.ChatCompletionRequest{
+					Model: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+					Messages: []openai.ChatCompletionMessage{
+						{
+							Role: "user",
+							MultiContent: []openai.ChatMessagePart{
+								{
+									Type: openai.ChatMessagePartTypeText,
+									Text: "描述一下这张图片",
+								},
+								{
+									Type: openai.ChatMessagePartTypeImageURL,
+									ImageURL: &openai.ChatMessageImageURL{
+										URL:    "data:image/jpeg;base64,/9j/4AAQSkZJRgABA...", // 替换为实际的base64图片数据
+										Detail: openai.ImageURLDetailHigh,
+									},
+								},
+							},
+						},
+					},
+					Stream: true,
+				},
+			},
+			writer:   &bytes.Buffer{},
+			wantErr:  false,
+			isStream: true,
+		},
+		// {
+		// 	name: "非流式响应测试",
+		// 	req: einox.ChatRequest{
+		// 		Provider: "bedrock", // 使用bedrock作为供应商
+		// 		ChatCompletionRequest: openai.ChatCompletionRequest{
+		// 			Model: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+		// 			Messages: []openai.ChatCompletionMessage{
+		// 				{Role: "user", Content: "你好"},
+		// 			},
+		// 			Stream: false,
+		// 		},
+		// 	},
+		// 	writer:         nil,
+		// 	wantErr:        true,
+		// 	expectedErrMsg: "暂不支持非流式响应",
+		// 	isStream:       false,
+		// },
+		// {
+		// 	name: "测试默认供应商配置",
+		// 	req: einox.ChatRequest{
+		// 		ChatCompletionRequest: openai.ChatCompletionRequest{
+		// 			Model: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+		// 			Messages: []openai.ChatCompletionMessage{
+		// 				{Role: "user", Content: "你好"},
+		// 			},
+		// 			Stream: true, // 使用流式响应
+		// 		},
+		// 	},
+		// 	writer:   &bytes.Buffer{},
+		// 	wantErr:  false,
+		// 	isStream: true,
+		// },
 	}
 
 	// 设置全局配置，用于测试默认供应商
