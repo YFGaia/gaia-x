@@ -13,7 +13,7 @@ const useStyle = createStyles(({ token, css }) => {
     `,
     tabs: css`
       .ant-tabs-nav {
-        padding: 0 16px;
+        padding-left: 12px;
         margin-bottom: 0;
       }
       .ant-tabs-nav-list {

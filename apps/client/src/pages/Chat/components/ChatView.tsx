@@ -48,7 +48,6 @@ const useStyle = createStyles(({ token, css }) => {
       overflow: hidden;
       height: 100%;
       width: 100%;
-      max-width: 700px;
       margin: 0 auto;
       box-sizing: border-box;
       display: flex;
@@ -57,6 +56,9 @@ const useStyle = createStyles(({ token, css }) => {
       gap: 16px;
       .ant-bubble-list::-webkit-scrollbar {
         display: none;
+      }
+      .ant-bubble-list {
+        padding-bottom: 4rem;
       }
       .ant-bubble::-webkit-scrollbar {
         display: none;
@@ -68,6 +70,15 @@ const useStyle = createStyles(({ token, css }) => {
       /* IE */
       .ant-bubble {
         -ms-overflow-style: none;
+      }
+
+      @media (min-width: 900px) {
+        max-width: 56rem;
+      }
+
+      .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+        padding: 0 12px;
+        margin: 0;
       }
     `,
     messages: css`
@@ -180,8 +191,10 @@ const thinkingItems = (reasoning: string): CollapseProps['items'] => {
       label: '推理过程',
       children: (
         <div className="flex flex-row relative">
-          <div className="w-[4px] bg-gray-300  rounded-full absolute left-0 top-0 bottom-0 min-h-full"></div>
-          <div className="pl-4 flex-1">{renderMarkdown(reasoning)}</div>
+          {/* 左侧竖线 */}
+          <div className="w-[2px] bg-gray-300 rounded-full absolute left-0 top-0 bottom-0 min-h-full"></div>
+          {/* 推理内容 */}
+          <pre className="pl-4 flex-1 text-wrap font-sans p-0 m-0">{reasoning}</pre>
         </div>
       ),
     },
