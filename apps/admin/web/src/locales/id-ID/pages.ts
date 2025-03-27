@@ -1,6 +1,5 @@
 export default {
-  'pages.layouts.userLayout.title':
-    'Go Al with Gaia, Accelerate to Win',
+  'pages.layouts.userLayout.title': 'Go Al with Gaia, Accelerate to Win',
   'pages.login.accountLogin.tab': 'Login dengan akun',
   'pages.login.accountLogin.errorMessage': 'Nama pengguna dan kata sandi salah(admin/ant.design)',
   'pages.login.failure': 'Log masuk gagal, silakan coba lagi!',
