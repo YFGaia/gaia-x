@@ -44,6 +44,12 @@ export default [
     ],
   },
   {
+    path: '/init',
+    layout: false,
+    name: 'init',
+    component: './init',
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     icon: 'dashboard',

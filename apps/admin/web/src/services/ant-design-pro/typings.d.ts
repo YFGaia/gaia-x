@@ -27,6 +27,13 @@ declare namespace API {
     status?: string;
     type?: string;
     currentAuthority?: string;
+    code?: number;
+    msg?: string;
+    data?: {
+      user?: CurrentUser;
+      token?: string;
+      expiresAt?: number;
+    };
   };
 
   type PageParams = {
@@ -66,6 +73,15 @@ declare namespace API {
     password?: string;
     autoLogin?: boolean;
     type?: string;
+    captcha?: string;
+    captchaId?: string;
+  };
+
+  type CaptchaResult = {
+    captchaId: string;
+    picPath: string;
+    captchaLength: number;
+    openCaptcha: boolean;
   };
 
   type ErrorResponse = {

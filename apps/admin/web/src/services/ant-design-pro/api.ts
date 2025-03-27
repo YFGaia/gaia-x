@@ -92,3 +92,67 @@ export async function removeRule(options?: { [key: string]: any }) {
     },
   });
 }
+
+// GVA框架的登录接口
+export async function gvaLogin(params: {
+  username: string;
+  password: string;
+  captcha?: string;
+  captchaId?: string;
+}) {
+  return request<API.LoginResult>('/api/base/login', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// GVA框架的验证码接口
+export async function getCaptcha() {
+  return request<{
+    code: number;
+    data: {
+      captchaId: string;
+      picPath: string;
+      captchaLength: number;
+      openCaptcha: boolean;
+    };
+    msg: string;
+  }>('/api/base/captcha', {
+    method: 'POST',
+  });
+}
+
+// 检查数据库初始化接口
+export async function checkDBInit() {
+  return request<{
+    code: number;
+    data: {
+      needInit: boolean;
+    };
+    msg: string;
+  }>('/api/init/checkdb', {
+    method: 'POST',
+  });
+}
+
+// 初始化数据库接口
+export async function initDatabase(params: {
+  dbtype?: string;
+  host?: string;
+  port?: string;
+  username?: string;
+  password?: string;
+  dbname?: string;
+  autoCreate?: boolean;
+  adminPassword?: string;
+  confirmAdminPassword?: string;
+}) {
+  return request<{
+    code: number;
+    data: boolean;
+    msg: string;
+  }>('/api/init/initdb', {
+    method: 'POST',
+    data: params,
+  });
+}
