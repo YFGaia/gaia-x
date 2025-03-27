@@ -67,19 +67,26 @@ const ToolBar: React.FC = () => {
       setToolbarActions(actions);
       setIsAlpha(currentToolbarTranslucent);
       shouldCallClipboardAgain.current = alpha;
+    },
+    [] // 移除 toolbarTranslucent 依赖，因为我们每次都直接从 store 获取最新值
+  );
 
-      // 调整工具栏大小
+  // 监听 toolbarActions 变化，在 DOM 更新后调整窗口大小
+  useEffect(() => {
+    if (!isVisible) return;
+    
+    // 使用 requestAnimationFrame 确保在下一帧DOM更新后执行
+    requestAnimationFrame(() => {
       const bounds = toolbarRef.current?.getBoundingClientRect();
       if (bounds) {
-        console.log('调整工具栏大小', bounds);
+        console.log('调整工具栏大小', bounds, toolbarActions);
         window.ipcRenderer.send(ToolbarChannel.RESIZE_TOOLBAR, {
           width: bounds.width,
           height: bounds.height,
         });
       }
-    },
-    [] // 移除 toolbarTranslucent 依赖，因为我们每次都直接从 store 获取最新值
-  );
+    });
+  }, [toolbarActions, isVisible]);
 
   useEffect(() => {
     // 初始化 store
@@ -106,14 +113,14 @@ const ToolBar: React.FC = () => {
     };
 
     // 调整工具栏大小
-    const bounds = toolbarRef.current?.getBoundingClientRect();
-    if (bounds) {
-      console.log('调整工具栏大小', bounds);
-      window.ipcRenderer.send(ToolbarChannel.RESIZE_TOOLBAR, {
-        width: bounds.width,
-        height: bounds.height,
-      });
-    }
+    // const bounds = toolbarRef.current?.getBoundingClientRect();
+    // if (bounds) {
+    //   console.log('调整工具栏大小', bounds);
+    //   window.ipcRenderer.send(ToolbarChannel.RESIZE_TOOLBAR, {
+    //     width: bounds.width,
+    //     height: bounds.height,
+    //   });
+    // }
 
     const clearShowToolBar = window.ipcRenderer.on(ToolbarChannel.SHOW_TOOLBAR, handleShowToolbar);
     const cleanTextSelected = window.ipcRenderer.on(
