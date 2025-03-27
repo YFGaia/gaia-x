@@ -38,6 +38,12 @@ export default [
         component: './user/register',
       },
       {
+        name: 'redirect',
+        icon: 'smile',
+        path: '/user/redirect',
+        component: './user/redirect',
+      },
+      {
         component: './404',
         path: '*',
       },

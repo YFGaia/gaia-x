@@ -64,4 +64,11 @@ export default {
   'pages.searchTable.tenThousand': '万',
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
+  
+  // 重定向页面文本
+  'pages.redirect.title': '登录到 Gaia-X 桌面?',
+  'pages.redirect.subtitle': '您当前已登录为:',
+  'pages.redirect.note': '请只在从 Gaia-X 应用来的情况下登录。',
+  'pages.redirect.cancel': '取消',
+  'pages.redirect.confirm': '是的，登录',
 };

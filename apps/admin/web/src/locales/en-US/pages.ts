@@ -66,4 +66,11 @@ export default {
   'pages.searchTable.tenThousand': '0000',
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
+  
+  // Redirect page text
+  'pages.redirect.title': 'Log in to Gaia-X desktop?',
+  'pages.redirect.subtitle': 'You\'re currently logged in as:',
+  'pages.redirect.note': 'Please only log in if you just came from the Gaia-X app.',
+  'pages.redirect.cancel': 'Cancel',
+  'pages.redirect.confirm': 'Yes, Log In',
 };
