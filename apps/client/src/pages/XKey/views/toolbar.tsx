@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './toolbar.css';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DefaultPresets } from '@/types/xKey/constants';
 import { ToolbarChannel, SettingChannel } from '@/types/ipc/xKey';
 import { ToolAction } from '@/types/xKey/types';
 import { getIcon } from '../assets/iconConfig';
@@ -168,13 +167,6 @@ const ToolBar: React.FC = () => {
             <span>{action.title}</span>
           </button>
         ))}
-        {/* <button
-          onClick={(e) => handleAction(e, 'settings')}
-          className="toolbar-button"
-          title="设置"
-        >
-          {getIcon('RiSettings4Fill')}
-        </button> */}
       </div>
     </div>
   );

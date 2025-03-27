@@ -266,7 +266,7 @@ export default class ToolbarWindow {
     const [x, y] = toolbarWindow.getPosition();
   
     ChatWindow.newChat(preset);
-    console.log('preset22222', preset);
+    logger.info('preset', preset);
     ChatWindow.showWindow(x, y, preset);
     const selection = await getSelection();
     if (selection) {

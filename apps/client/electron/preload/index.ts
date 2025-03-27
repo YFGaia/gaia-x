@@ -123,7 +123,11 @@ function useLoading() {
 // ----------------------------------------------------------------------
 
 const { appendLoading, removeLoading } = useLoading()
-domReady().then(appendLoading)
+// 工具条页面不显示loading
+if (!document.URL.includes('toolbar')) {
+  domReady().then(appendLoading)
+}
+
 
 window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading()
