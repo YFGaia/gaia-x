@@ -1,18 +1,12 @@
 import { Footer } from '@/components';
-import { gvaLogin, getCaptcha, checkDBInit } from '@/services/ant-design-pro/api';
-import {
-  LockOutlined,
-  UserOutlined,
-  GithubOutlined,
-} from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { FormattedMessage, Helmet, SelectLang, useIntl, useModel, history } from '@umijs/max';
-import { Alert, message, Tabs, Button } from 'antd';
+import { getCaptcha, login } from '@/services/gaia-x-admin';
+import { checkDBInit } from '@/services/gaia-x-admin/initdb';
+import { GithubOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LoginForm, ProFormText } from '@ant-design/pro-components';
+import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
+import { Alert, Button, message, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 
@@ -89,7 +83,7 @@ const ActionIcons = () => {
 
   return (
     <>
-      <GithubOutlined key="GithubOutlined" className={styles.action}/>
+      <GithubOutlined key="GithubOutlined" className={styles.action} />
     </>
   );
 };
@@ -205,8 +199,8 @@ const Login: React.FC = () => {
       };
 
       // 登录
-      const result = await gvaLogin(loginParams);
-      
+      const result = await login(loginParams);
+
       if (result.code === 0) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
@@ -218,10 +212,10 @@ const Login: React.FC = () => {
         window.location.href = urlParams.get('redirect') || '/';
         return;
       }
-      
+
       // 如果登录失败，刷新验证码
       fetchCaptcha();
-      
+
       // 设置错误状态
       setUserLoginState({ status: 'error', type: 'account' });
       message.error(result.msg || '登录失败');
@@ -236,7 +230,7 @@ const Login: React.FC = () => {
       fetchCaptcha();
     }
   };
-  
+
   const { status, type: loginType } = userLoginState;
 
   // 处理初始化按钮点击
@@ -349,7 +343,7 @@ const Login: React.FC = () => {
                     },
                   ]}
                 />
-                
+
                 {/* 验证码输入区域，仅在需要验证码时显示 */}
                 {captchaInfo?.openCaptcha && (
                   <div className={styles.captchaContainer}>
@@ -385,14 +379,14 @@ const Login: React.FC = () => {
               </>
             )}
           </LoginForm>
-          
-          <Button 
+
+          <Button
             style={{
               width: '350px',
               minWidth: 280,
               height: '40px',
             }}
-            type="primary" 
+            type="primary"
             block
             size="large"
             className={styles.initButton}
@@ -400,8 +394,11 @@ const Login: React.FC = () => {
             disabled={!initState.needInit}
             loading={initState.loading}
           >
-            {initState.loading ? '检查初始化状态...' : 
-             initState.needInit ? '前往初始化' : '系统已初始化'}
+            {initState.loading
+              ? '检查初始化状态...'
+              : initState.needInit
+                ? '前往初始化'
+                : '系统已初始化'}
           </Button>
         </div>
       </div>
