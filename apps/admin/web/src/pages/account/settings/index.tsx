@@ -15,9 +15,9 @@ const Settings: React.FC = () => {
   const { styles } = useStyles();
   const menuMap: Record<string, React.ReactNode> = {
     base: '基本设置',
-    security: '安全设置',
-    binding: '账号绑定',
-    notification: '新消息通知',
+    security: '安全设置（待开发）',
+    binding: '账号绑定（待开发）',
+    notification: '新消息通知（待开发）',
   };
   const [initConfig, setInitConfig] = useState<SettingsState>({
     mode: 'inline',
