@@ -1,8 +1,10 @@
 import { request } from '@umijs/max';
-import type { CurrentUser, GeographicItemType } from './data';
+import type { GeographicItemType } from './data';
+import { getUserInfo } from '@/services/gaia-x-admin/api';
 
-export async function queryCurrent(): Promise<{ data: CurrentUser }> {
-  return request('/api/accountSettingCurrentUser');
+export async function queryCurrent(): Promise<{ data: API.UserInfo }> {
+  const response = await getUserInfo();
+  return { data: response.data.userInfo };
 }
 
 export async function queryProvince(): Promise<{ data: GeographicItemType[] }> {

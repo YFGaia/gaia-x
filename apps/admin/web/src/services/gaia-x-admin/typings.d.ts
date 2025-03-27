@@ -2,34 +2,6 @@
 /* eslint-disable */
 
 declare namespace API {
-  type CurrentUser = {
-    name?: string;
-    avatar?: string;
-    userid?: string;
-    email?: string;
-    signature?: string;
-    title?: string;
-    group?: string;
-    tags?: { key?: string; label?: string }[];
-    notifyCount?: number;
-    unreadCount?: number;
-    country?: string;
-    access?: string;
-    geographic?: {
-      province?: { label?: string; key?: string };
-      city?: { label?: string; key?: string };
-    };
-    address?: string;
-    phone?: string;
-    username?: string;
-    uuid?: string;
-    nickName?: string;
-    headerImg?: string;
-    authorityId?: string;
-    authorities?: { authorityId?: string }[];
-    enable?: number;
-  };
-
   type LoginResult = {
     status?: string;
     type?: string;
@@ -69,13 +41,24 @@ declare namespace API {
   };
 
   type UserInfo = {
-    id?: number;
+    ID?: number;
     uuid?: string;
-    username?: string;
+    userName?: string;
     nickName?: string;
     headerImg?: string;
-    authorityId?: string;
-    authorityIds?: string[];
+    authorityId?: number;
+    authority?: {
+      authorityId: number;
+      authorityName: string;
+      parentId: number;
+      defaultRouter: string;
+    };
+    authorities?: {
+      authorityId: number;
+      authorityName: string;
+      parentId: number;
+      defaultRouter: string;
+    }[];
     enable?: number;
     phone?: string;
     email?: string;

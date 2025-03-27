@@ -1,27 +1,13 @@
 import { UploadOutlined } from '@ant-design/icons';
 import {
   ProForm,
-  ProFormDependency,
-  ProFormFieldSet,
-  ProFormSelect,
   ProFormText,
-  ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useRequest } from '@umijs/max';
-import { Button, Input, message, Upload } from 'antd';
+import { Button, message, Upload } from 'antd';
 import React from 'react';
-import { queryCity, queryCurrent, queryProvince } from '../service';
+import { queryCurrent } from '../service';
 import useStyles from './index.style';
-
-const validatorPhone = (rule: any, value: string[], callback: (message?: string) => void) => {
-  if (!value[0]) {
-    callback('Please input your area code!');
-  }
-  if (!value[1]) {
-    callback('Please input your phone number!');
-  }
-  callback();
-};
 
 const BaseView: React.FC = () => {
   const { styles } = useStyles();
@@ -47,8 +33,8 @@ const BaseView: React.FC = () => {
   });
   const getAvatarURL = () => {
     if (currentUser) {
-      if (currentUser.avatar) {
-        return currentUser.avatar;
+      if (currentUser.headerImg) {
+        return currentUser.headerImg;
       }
       const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
       return url;
@@ -74,10 +60,15 @@ const BaseView: React.FC = () => {
               }}
               initialValues={{
                 ...currentUser,
-                phone: currentUser?.phone.split('-'),
               }}
               hideRequiredMark
             >
+              <ProFormText
+                width="md"
+                name="userName"
+                label="用户名"
+                disabled
+              />
               <ProFormText
                 width="md"
                 name="email"
@@ -91,7 +82,7 @@ const BaseView: React.FC = () => {
               />
               <ProFormText
                 width="md"
-                name="name"
+                name="nickName"
                 label="昵称"
                 rules={[
                   {
@@ -100,122 +91,17 @@ const BaseView: React.FC = () => {
                   },
                 ]}
               />
-              <ProFormTextArea
-                name="profile"
-                label="个人简介"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入个人简介!',
-                  },
-                ]}
-                placeholder="个人简介"
-              />
-              <ProFormSelect
-                width="sm"
-                name="country"
-                label="国家/地区"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的国家或地区!',
-                  },
-                ]}
-                options={[
-                  {
-                    label: '中国',
-                    value: 'China',
-                  },
-                ]}
-              />
-
-              <ProForm.Group title="所在省市" size={8}>
-                <ProFormSelect
-                  rules={[
-                    {
-                      required: true,
-                      message: '请输入您的所在省!',
-                    },
-                  ]}
-                  width="sm"
-                  fieldProps={{
-                    labelInValue: true,
-                  }}
-                  name="province"
-                  className={styles.item}
-                  request={async () => {
-                    return queryProvince().then(({ data }) => {
-                      return data.map((item) => {
-                        return {
-                          label: item.name,
-                          value: item.id,
-                        };
-                      });
-                    });
-                  }}
-                />
-                <ProFormDependency name={['province']}>
-                  {({ province }) => {
-                    return (
-                      <ProFormSelect
-                        params={{
-                          key: province?.value,
-                        }}
-                        name="city"
-                        width="sm"
-                        rules={[
-                          {
-                            required: true,
-                            message: '请输入您的所在城市!',
-                          },
-                        ]}
-                        disabled={!province}
-                        className={styles.item}
-                        request={async () => {
-                          if (!province?.key) {
-                            return [];
-                          }
-                          return queryCity(province.key || '').then(({ data }) => {
-                            return data.map((item) => {
-                              return {
-                                label: item.name,
-                                value: item.id,
-                              };
-                            });
-                          });
-                        }}
-                      />
-                    );
-                  }}
-                </ProFormDependency>
-              </ProForm.Group>
               <ProFormText
                 width="md"
-                name="address"
-                label="街道地址"
+                name="phone"
+                label="手机号码"
                 rules={[
                   {
                     required: true,
-                    message: '请输入您的街道地址!',
+                    message: '请输入您的手机号码!',
                   },
                 ]}
               />
-              <ProFormFieldSet
-                name="phone"
-                label="联系电话"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的联系电话!',
-                  },
-                  {
-                    validator: validatorPhone,
-                  },
-                ]}
-              >
-                <Input className={styles.area_code} />
-                <Input className={styles.phone_number} />
-              </ProFormFieldSet>
             </ProForm>
           </div>
           <div className={styles.right}>

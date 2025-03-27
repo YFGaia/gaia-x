@@ -140,3 +140,11 @@ export async function resetPassword(data: { id: number }) {
     data,
   });
 }
+
+/** 退出登录接口 POST /api/base/logout */
+export async function outLogin(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/jwt/jsonInBlacklist', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
