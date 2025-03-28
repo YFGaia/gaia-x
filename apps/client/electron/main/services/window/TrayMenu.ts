@@ -80,11 +80,10 @@ export class TrayMenu {
     // 根据环境确定图标路径
     let iconPath;
     if (isDev()) {
+      // 开发环境
       if (isMacOS()) {
-        // 开发环境
         iconPath = join(process.env.APP_ROOT as string, 'src/assets/favicon-mac.png');
       } else {
-        // 开发环境
         iconPath = join(process.env.APP_ROOT as string, 'src/assets/icon.png');
       }
     } else {

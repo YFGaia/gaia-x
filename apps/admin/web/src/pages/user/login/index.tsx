@@ -264,7 +264,7 @@ const Login: React.FC = () => {
             contentStyle={{
               width: '100%',
             }}
-            logo={<img alt="logo" src="/logo.svg" />}
+            logo={<img alt="logo" />}
             title="Gaia-X-Admin"
             subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
             initialValues={{

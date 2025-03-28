@@ -2,13 +2,13 @@
 @import '@/pages/XKey/assets/light-vars.css';
 @import '@/pages/XKey/assets/dark-vars.css';
 
-.app-icon {
+/* .app-icon {
   width: 100px;
   height: 32px;
   scale: 0.8;
   background-image: url('@/pages/XKey/assets/gaia-x.png');
   background-size: cover;
-}
+} */
 
 .main {
   margin: 0;

@@ -2,7 +2,9 @@ import { Button, GetProp } from 'antd';
 import { Prompts, Welcome } from '@ant-design/x';
 import { Space } from 'antd';
 import { createStyles } from 'antd-style';
-import logoSite from '@/assets/logo-site.png';
+// import logoSite from '@/assets/gaia-logo-light.png';
+import { Logo } from '@/components/Logo';
+
 import {
   ShareAltOutlined,
   EllipsisOutlined,
@@ -87,23 +89,7 @@ const placeholderNode: React.FC<PlaceholderNodeProps> = ({ onRequest }) => {
     <Space direction="vertical" size={16} className={styles.placeholder}>
       <Welcome
         variant="borderless"
-        icon={
-          <img
-            src={logoSite}
-            alt="Logo"
-            style={{
-              width: 48,
-              height: 48,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 0 1px white)',
-              userSelect: 'none',
-              pointerEvents: 'none'
-            }}
-          />
-        }
+        icon={<Logo size="tiny" />}
         title={"Hello, I'm Gaia-X"}
         description="基于 MCP 协议的智能桌面助手，为开发者提供 AI 驱动的工具集成与智能协作体验"
         extra={

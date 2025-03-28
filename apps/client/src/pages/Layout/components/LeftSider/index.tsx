@@ -3,8 +3,9 @@ import PluginsMenu from "@/pages/Plugins/components/Menu";
 import { SettingsRouter } from "@/pages/Settings/Components/SettingView";
 import { Tabs, TabsProps } from "antd";
 import { createStyles } from "antd-style";
-import { VscExtensions, VscOctoface, VscSettings, VscSettingsGear  } from "react-icons/vsc";
+import { VscExtensions, VscSettings, VscSettingsGear  } from "react-icons/vsc";
 import { RiHistoryFill } from "react-icons/ri";
+import { McpLogo } from "@/components/Logo/McpLogo";
 import { useViewStore } from "@/stores/ViewStore";
 import { useCallback } from "react";
 const useStyle = createStyles(({ token, css }) => {
@@ -59,8 +60,8 @@ const LeftSider: React.FC = () => {
     },
     {
       key: 'mcp',
-      label: <TabLabel icon={<VscOctoface fontSize={16}/>} />,
-      children: <div>MCP</div>
+      label: <TabLabel icon={<McpLogo size={18} />} />,
+      children: <div></div>
     },
     {
       key: 'plugin',

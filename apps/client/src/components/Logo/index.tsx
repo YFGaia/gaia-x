@@ -1,34 +1,44 @@
+import { useSettingStore } from '@/stores/SettingStore';
+
 interface LogoProps {
-    size: 'small' | 'medium' | 'large'
-    className?: string
+  size: 'tiny' | 'small' | 'medium' | 'large'
+  className?: string
 }
 
 // 导入 logo 图片
-import logoImage from '@/assets/logo-site.png';
+import logoImage from '@/assets/gaia-logo-light.png';
+import logoImageDark from '@/assets/gaia-logo-dark.png';
 
 export const Logo: React.FC<LogoProps> = ({
-    size = 'medium',
-    className
+  size = 'medium',
+  className
 }) => {
-    // TODO：Tailwind 类名未生效，使用 style 属性替代
-    const sizeValues = {
-        small: { width: '70px' },
-        medium: { width: '135px' },
-        large: { width: '150px' }
-    }
-    
-    return (
-        <img 
-            src={logoImage} 
-            alt="logo" 
-            className={className}
-            style={{
-                ...sizeValues[size],
-                filter: 'drop-shadow(0 0 2px white)',
-                userSelect: 'none',
-                pointerEvents: 'none'
-            }} 
-        />
-    )
+  // Get current theme from settings store
+  const theme = useSettingStore((state) => state.settings['app.theme']);
+
+  // Size values with proper aspect ratio maintained
+  const sizeValues = {
+    tiny: { width: '48px', height: '48px' },
+    small: { width: '70px', height: '70px' },
+    medium: { width: '135px', height: 'auto' },
+    large: { width: '150px', height: 'auto' }
+  }
+
+  // Choose logo based on theme
+  const currentLogo = theme === 'dark' ? logoImageDark : logoImage;
+
+  return (
+    <img
+      src={currentLogo}
+      alt="logo"
+      className={className}
+      style={{
+        ...sizeValues[size],
+        objectFit: 'contain',
+        userSelect: 'none',
+        pointerEvents: 'none'
+      }}
+    />
+  )
 };
 
