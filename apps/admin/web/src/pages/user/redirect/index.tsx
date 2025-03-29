@@ -22,12 +22,35 @@ const RedirectPage: React.FC = () => {
     history.push('/account/settings');
   };
 
+  // 从cookie中获取token
+  const getTokenFromCookie = () => {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith('x-token=')) {
+        return cookie.substring('x-token='.length, cookie.length);
+      }
+    }
+    return '';
+  };
+
   // 处理确认按钮点击
   const handleConfirm = () => {
-    // 跳转到Gaia-x应用
-    window.location.href = 'gaia-x://';
+    // 从cookie中获取token
+    const token = getTokenFromCookie();
+    
+    // 跳转到Gaia-x应用并带上token
+    if (token) {
+      window.location.href = `gaia-x://?token=${encodeURIComponent(token)}`;
+    } else {
+      // 如果未找到token，仍然跳转但不带token
+      window.location.href = 'gaia-x://';
+    }
+
+    console.log('token', token);
+    
     // 返回到个人设置页
-    history.push('/account/settings');
+    // history.push('/account/settings');
   };
 
   return (

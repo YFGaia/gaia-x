@@ -55,18 +55,18 @@ const Login: React.FC<{ className?: string }> = ({ className }) => {
 
   async function getUserInfo(token: string): Promise<boolean> {
     try {
-      console.log('我调用的3');
-      const response = await UserApi.getUserInfo(token);
-      if (response.code !== 0 || !response.data) {
-        setLoading(false);
-        console.error('获取用户信息失败:', response.message);
-        return false;
-      }
-      const { user_id, name, jwt_token } = response.data;
+      // TODO：临时注释掉，先改成直接从cookie中获取token
+      // const response = await UserApi.getUserInfo(token);
+      // if (response.code !== 0 || !response.data) {
+      //   setLoading(false);
+      //   console.error('获取用户信息失败:', response.message);
+      //   return false;
+      // }
+      // const { user_id, name, jwt_token } = response.data;
       const userInfo = {
-        id: user_id,
-        username: name,
-        token: jwt_token,
+        id: "1",
+        username: "管理员",
+        token: token,
       };
       console.log(userInfo);
       if (
@@ -83,7 +83,7 @@ const Login: React.FC<{ className?: string }> = ({ className }) => {
   }
 
   function loginSuccess(userId: string) {
-    VersionService.checkUpdate(false);
+    // VersionService.checkUpdate(false);
     window.ipcRenderer.send(WindowChannel.LOGIN_SUCCESS, userId);
   }
 
