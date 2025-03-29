@@ -3,10 +3,11 @@ package core
 import (
 	"flag"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/core/internal"
-	"github.com/gin-gonic/gin"
 	"os"
 	"path/filepath"
+
+	"github.com/flipped-aurora/gin-vue-admin/server/core/internal"
+	"github.com/gin-gonic/gin"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -67,5 +68,27 @@ func Viper(path ...string) *viper.Viper {
 
 	// root 适配性 根据root位置去找到对应迁移位置,保证root路径有效
 	global.GVA_CONFIG.AutoCode.Root, _ = filepath.Abs("..")
+
+	// 获取当前工作目录
+	workDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("获取工作目录失败: %v\n", err)
+	}
+
+	// 使用绝对路径设置环境变量
+	configPath := filepath.Join(workDir, "data/einox/config/llm")
+	rsaKeysPath := filepath.Join(workDir, "data/einox/rsa_keys")
+
+	os.Setenv("LLM_CONFIG_PATH", configPath)
+	os.Setenv("EINOX_RSA_KEYS_DIR", rsaKeysPath)
+
+	// 验证路径是否存在
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		fmt.Printf("警告：LLM配置路径不存在: %s\n", configPath)
+	}
+	if _, err := os.Stat(rsaKeysPath); os.IsNotExist(err) {
+		fmt.Printf("警告：RSA密钥路径不存在: %s\n", rsaKeysPath)
+	}
+
 	return v
 }
