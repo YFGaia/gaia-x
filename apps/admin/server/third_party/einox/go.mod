@@ -1,4 +1,4 @@
-module github.com/gaia-x/eino-x
+module github.com/YFGaia/eino-x
 
 go 1.23.3
 

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	einox "github.com/YFGaia/eino-x"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	einox "github.com/gaia-x/eino-x"
 )
 
 // InitEnvironment 初始化测试环境需要的环境变量

@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	einox "github.com/gaia-x/eino-x"
+	einox "github.com/YFGaia/eino-x"
 	"github.com/sashabaranov/go-openai"
 )
 

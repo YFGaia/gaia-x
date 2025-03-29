@@ -4,9 +4,9 @@ import (
 	"errors"
 	"io"
 
+	einox "github.com/YFGaia/eino-x"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/ai"
-	einox "github.com/gaia-x/eino-x"
 )
 
 // ChatService 聊天服务接口

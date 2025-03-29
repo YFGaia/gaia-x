@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	einox "github.com/gaia-x/eino-x"
+	einox "github.com/YFGaia/eino-x"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 )

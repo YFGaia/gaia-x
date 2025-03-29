@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gaia-x/eino-x"
+	einox "github.com/YFGaia/eino-x"
 )
 
 // 执行命令行示例: go run cmd/encrypt/main.go "要加密的字符串"
