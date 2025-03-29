@@ -41,7 +41,7 @@ const RedirectPage: React.FC = () => {
     
     // 跳转到Gaia-x应用并带上token
     if (token) {
-      window.location.href = `gaia-x://?token=${encodeURIComponent(token)}`;
+      window.location.href = `gaia-x://?token=`+token;
     } else {
       // 如果未找到token，仍然跳转但不带token
       window.location.href = 'gaia-x://';
