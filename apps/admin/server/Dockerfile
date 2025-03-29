@@ -24,10 +24,6 @@ COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/server ./
 COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/resource ./resource/
 COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/config.docker.yaml ./
 
-# 复制llmadapter包
-COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/service/llmadapter/config/llm ./service/llmadapter/config/llm
-COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/service/llmadapter/rsa_keys ./service/llmadapter/rsa_keys
-
 # 挂载目录：如果使用了sqlite数据库，容器命令示例：docker run -d -v /宿主机路径/gva.db:/go/src/github.com/YFGaia/gaia-x/apps/admin/server/gva.db -p 8888:8888 --name gva-server-v1 gva-server:1.0
 # VOLUME ["/go/src/github.com/YFGaia/gaia-x/apps/admin/server"]
 

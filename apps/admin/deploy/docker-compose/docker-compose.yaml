@@ -15,13 +15,11 @@ volumes:
   
 services:
   web:
-    build:
-      context: ../../web
-      dockerfile: ./Dockerfile
+    image: gaia-x-admin-web:0.0.1
     container_name: gva-web
     restart: always
     ports:
-      - '8080:8080'
+      - '8000:8000'
     depends_on:
       - server
     command: [ 'nginx-debug', '-g', 'daemon off;' ]
@@ -30,9 +28,7 @@ services:
         ipv4_address: 177.7.0.11
 
   server:
-    build:
-      context: ../../server
-      dockerfile: ./Dockerfile
+    image: gaia-x-admin-server:0.0.1
     container_name: gva-server
     restart: always
     ports:
