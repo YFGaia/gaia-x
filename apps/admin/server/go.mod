@@ -239,7 +239,7 @@ require (
 )
 
 // 添加 einox 包的依赖
-require github.com/YFGaia/eino-x v0.0.0
+require github.com/YFGaia/eino-x v0.0.0-20250329092134-8b74ead95caa
 
-// 添加 replace 指令，将 einox 包指向本地路径
-replace github.com/YFGaia/eino-x => ./third_party/einox
+// 本地调试时打开，添加 replace 指令，将 einox 包指向本地路径
+// replace github.com/YFGaia/eino-x => ./third_party/einox

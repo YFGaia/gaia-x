@@ -43,3 +43,9 @@ web/pnpm-lock.yaml
 
 # 忽略gva_web
 gva_web/
+
+# 忽略eino-x本地调试目录
+/server/third_party/eino-x/
+
+# 忽略持久化目录
+server/data/
