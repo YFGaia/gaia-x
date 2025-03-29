@@ -1,0 +1,105 @@
+# OpenAI配置文件
+# 该文件配置了不同环境下的OpenAI API凭证信息
+# 程序会根据ENV环境变量选择对应的环境配置
+# 如果未设置ENV，则默认使用development环境
+
+environments:
+  # 开发环境配置
+  development:
+    credentials:
+      # 第一个凭证配置
+      - name: "openai-dev"  # 凭证名称
+        api_key: "YOUR_API_KEY_HERE"  # API密钥(会被加密处理)
+        organization_id: ""  # 组织ID，如果没有可以留空
+        enabled: true  # 是否启用该凭证
+        weight: 10  # 权重，多个凭证时按权重随机选择
+        qps_limit: 5  # 每秒查询次数限制
+        description: "开发环境OpenAI API密钥"  # 描述信息
+        models:  # 支持的模型列表
+          - "gpt-3.5-turbo"
+          - "gpt-4"
+          - "gpt-4-turbo"
+        base_url: "https://api.openai.com/v1"  # API基础URL
+        timeout: 30  # 超时时间(秒)
+        proxy: ""  # 代理设置，格式: "http://proxy.example.com:8080"
+      
+      # 可以添加多个凭证配置，系统会根据权重选择
+      - name: "openai-dev-backup"
+        api_key: "YOUR_API_KEY_HERE"
+        organization_id: ""
+        enabled: false  # 这个配置被禁用
+        weight: 5
+        qps_limit: 3
+        description: "开发环境备用OpenAI API密钥"
+        models:
+          - "gpt-3.5-turbo"
+        base_url: "https://api.openai.com/v1"
+        timeout: 30
+        proxy: ""
+
+  # 测试环境配置
+  test:
+    credentials:
+      - name: "openai-test"
+        api_key: "YOUR_API_KEY_HERE"
+        organization_id: ""
+        enabled: true
+        weight: 1
+        qps_limit: 10
+        description: "测试环境OpenAI API密钥"
+        models:
+          - "gpt-3.5-turbo"
+          - "gpt-4"
+        base_url: "https://api.openai.com/v1"
+        timeout: 30
+        proxy: ""
+
+  # 生产环境配置
+  production:
+    credentials:
+      - name: "openai-prod-1"
+        api_key: "YOUR_API_KEY_HERE"
+        organization_id: ""
+        enabled: true
+        weight: 10
+        qps_limit: 20
+        description: "生产环境OpenAI API密钥-1"
+        models:
+          - "gpt-3.5-turbo"
+          - "gpt-4"
+          - "gpt-4-turbo"
+        base_url: "https://api.openai.com/v1"
+        timeout: 60
+        proxy: ""
+      
+      - name: "openai-prod-2"
+        api_key: "YOUR_API_KEY_HERE"
+        organization_id: ""
+        enabled: true
+        weight: 10
+        qps_limit: 20
+        description: "生产环境OpenAI API密钥-2"
+        models:
+          - "gpt-3.5-turbo"
+          - "gpt-4"
+          - "gpt-4-turbo"
+        base_url: "https://api.openai.com/v1"
+        timeout: 60
+        proxy: ""
+
+  # 自定义API端点环境(如国内镜像)
+  custom:
+    credentials:
+      - name: "openai-custom"
+        api_key: "YOUR_API_KEY_HERE"
+        organization_id: ""
+        enabled: true
+        weight: 1
+        qps_limit: 10
+        description: "自定义OpenAI API端点"
+        models:
+          - "gpt-3.5-turbo"
+          - "gpt-4"
+        base_url: "YOUR_CUSTOM_ENDPOINT_URL_HERE"  # 自定义API端点
+        timeout: 30
+        proxy: ""  # 如果需要代理访问 

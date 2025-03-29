@@ -1,0 +1,92 @@
+# Azure OpenAI API配置文件
+# 包含开发和生产环境的多组API密钥配置
+
+environments:
+  # 开发环境配置
+  development:
+    # 开发环境配置组
+    credentials:
+      # Azure OpenAI开发测试配置组1
+      - name: "dev_azure1"
+        # Azure API密钥 加密的
+        api_key: ""             
+        endpoint: ""  # Azure端点地址
+        api_version: ""                 # API版本
+        models:                                   # 支持的模型列表
+          - "gpt-35-turbo"
+          - "gpt-4o"
+
+        deployment_id: "gpt-4o"                   # 部署ID
+        enabled: true                             # 是否启用该配置
+        weight: 50                                # 负载均衡权重
+        qps_limit: 10                             # 每秒请求限制
+        description: "Azure OpenAI开发测试账号1"    # 配置说明
+        timeout: 300                              # 请求超时时间（秒）
+        proxy: ""                                 # HTTP代理配置
+        
+      # Azure OpenAI开发测试配置组2
+      - name: "dev_azure2"
+        # 使用加密函数加密的api_key
+        api_key: "YOUR_API_KEY_HERE"
+        endpoint: "YOUR_ENDPOINT_URL_HERE"
+        deployment_id: "dev-deployment-2"
+        api_version: "2024-02-15-preview"
+        enabled: false
+        weight: 50
+        qps_limit: 10
+        description: "Azure OpenAI开发测试账号2"
+        models:
+          - "gpt-35-turbo-16k"
+          - "gpt-4-32k"
+        proxy: ""
+
+        # Azure OpenAI开发测试配置组1
+      - name: "dev_azure3"
+        api_key: "YOUR_API_KEY_HERE"             # Azure API密钥
+        endpoint: "YOUR_ENDPOINT_URL_HERE"  # Azure端点地址
+        api_version: "2024-02-01"                 # API版本
+        models:                                   # 支持的模型列表
+          - "gpt-35-turbo"
+          - "gpt-4o"
+
+        deployment_id: "gpt-4o"                   # 部署ID
+        enabled: false                              # 是否启用该配置
+        weight: 50                                # 负载均衡权重
+        qps_limit: 10                             # 每秒请求限制
+        description: "Azure OpenAI开发测试账号1"    # 配置说明
+        timeout: 30                               # 请求超时时间（秒）
+        proxy: ""                                 # HTTP代理配置
+        
+  # 生产环境配置
+  production:
+    # 生产环境配置组
+    credentials:
+      # Azure OpenAI生产主要配置组
+      - name: "prod_azure_primary"
+        api_key: "YOUR_API_KEY_HERE"
+        endpoint: "YOUR_ENDPOINT_URL_HERE"
+        deployment_id: "prod-deployment-1"
+        api_version: "2024-02-15-preview"
+        enabled: true
+        weight: 60
+        qps_limit: 100
+        description: "Azure OpenAI生产主账号"
+        models:
+          - "gpt-35-turbo"
+          - "gpt-4"
+        proxy: ""
+        
+      # Azure OpenAI生产备用配置组
+      - name: "prod_azure_backup"
+        api_key: "YOUR_API_KEY_HERE"
+        endpoint: "YOUR_ENDPOINT_URL_HERE"
+        deployment_id: "prod-deployment-2"
+        api_version: "2024-02-15-preview"
+        enabled: true
+        weight: 40
+        qps_limit: 50
+        description: "Azure OpenAI生产备用账号"
+        models:
+          - "gpt-35-turbo-16k"
+          - "gpt-4-32k"
+        proxy: ""

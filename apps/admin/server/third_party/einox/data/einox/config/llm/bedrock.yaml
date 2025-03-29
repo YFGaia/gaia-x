@@ -1,0 +1,77 @@
+# AWS Bedrock API配置文件
+# 包含开发和生产环境的多组API密钥配置
+
+environments:
+  # 开发环境配置
+  development:
+    credentials:
+      # Bedrock开发测试配置组1
+      - name: "dev_bedrock1"
+        # AWS访问密钥ID 加密版
+        access_key: ""
+        # AWS访问密钥 加密版
+        secret_access_key: ""
+        region: ""                       # AWS区域
+        session_token: ""                         # 会话令牌（可选）
+        enabled: true                             # 是否启用该配置
+        weight: 50                                # 负载均衡权重
+        qps_limit: 10                             # 每秒请求限制
+        description: "Bedrock开发测试账号1"         # 配置说明
+        models:                                   # 支持的模型列表
+          - "anthropic.claude-3-5-sonnet-20241022-v2:0"                # 模型ID
+          - "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+        timeout: 30                               # 请求超时时间（秒）
+        proxy: "http://35.167.204.161:8888"        # 代理设置，格式如 http://proxy-server:port
+
+      # Bedrock开发测试配置组2
+      - name: "dev_bedrock2"
+        access_key: "YOUR_ACCESS_KEY_HERE"
+        secret_access_key: "YOUR_SECRET_ACCESS_KEY_HERE"
+        region: "us-west-2"
+        session_token: ""
+        enabled: false
+        weight: 50
+        qps_limit: 10
+        description: "Bedrock开发测试账号2"
+        models:
+          - "anthropic.claude-v2"
+          - "ai21.j2-ultra-v1"
+        timeout: 30
+        proxy: ""
+        
+  # 生产环境配置
+  production:
+    credentials:
+      # Bedrock生产主要配置组
+      - name: "prod_bedrock_primary"
+        access_key: "YOUR_ACCESS_KEY_HERE"
+        secret_access_key: "YOUR_SECRET_ACCESS_KEY_HERE"
+        region: "us-east-1"
+        session_token: ""
+        enabled: true
+        weight: 60
+        qps_limit: 100
+        description: "Bedrock生产主账号"
+        models:
+          - "anthropic.claude-3-opus-20240229"
+          - "anthropic.claude-3-sonnet-20240229"
+          - "amazon.titan-text-express-v1"
+        timeout: 60
+        proxy: ""
+        
+      # Bedrock生产备用配置组
+      - name: "prod_bedrock_backup"
+        access_key: "YOUR_ACCESS_KEY_HERE"
+        secret_access_key: "YOUR_SECRET_ACCESS_KEY_HERE"
+        region: "us-west-2"
+        session_token: ""
+        enabled: true
+        weight: 40
+        qps_limit: 50
+        description: "Bedrock生产备用账号"
+        models:
+          - "anthropic.claude-3-opus-20240229"
+          - "anthropic.claude-3-sonnet-20240229"
+          - "ai21.j2-ultra-v1"
+        timeout: 60
+        proxy: "" 
