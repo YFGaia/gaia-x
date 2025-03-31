@@ -44,9 +44,15 @@ export default class ChatWindow {
     }
     logger.info('showAt', x, y);
     const window = WindowManager.getInstance().getWindow(WindowId.Main);
+    
+    // Set window properties before showing
+    window.setVisibleOnAllWorkspaces(true);
+    window.setAlwaysOnTop(true, 'floating');
+    
     if (window.isMinimized()) {
       window.restore();
     }
+    
     let moreHeight = 0;
     console.log('preset', preset);
     if (preset?.userInputForm?.length) {
@@ -95,8 +101,18 @@ export default class ChatWindow {
       window.setPosition(adjustedX || 0, adjustedY || 0);
     }
     
+    // Show and focus the window
     window.show();
+    window.moveTop(); // Ensure window is at the top of the window stack
     window.focus();
+    
+    // Keep the window visible for a short period to ensure it stabilizes
+    setTimeout(() => {
+      if (!ChatWindow._isPinned) {
+        window.setAlwaysOnTop(false);
+        window.setVisibleOnAllWorkspaces(false);
+      }
+    }, 1000);
   }
 
 }

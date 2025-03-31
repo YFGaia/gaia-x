@@ -48,7 +48,12 @@ const WindowControls: React.FC = () => {
   }
   const handleBlur = useCallback(() => {
     if (!isPinned && mode === 'mini') {
-      window.ipcRenderer.send(WindowChannel.HIDE_WINDOW);
+      setTimeout(() => {
+        const win = window as any;
+        if (win && !win.document.hasFocus()) {
+          window.ipcRenderer.send(WindowChannel.HIDE_WINDOW);
+        }
+      }, 300);
     }
   }, [isPinned, mode]);
 
