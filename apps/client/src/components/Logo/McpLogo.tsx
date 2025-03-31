@@ -1,4 +1,3 @@
-import { useSettingStore } from '@/stores/SettingStore';
 import { createStyles } from 'antd-style';
 
 interface McpLogoProps {
@@ -6,17 +5,11 @@ interface McpLogoProps {
   className?: string;
 }
 
-import mcpLogoLight from '@/assets/mcp-logo-light.svg';
-import mcpLogoDark from '@/assets/mcp-logo-dark.svg';
-
-const useStyles = createStyles(({ css }) => ({
+const useStyles = createStyles(({ css, token }) => ({
   logoWrapper: css`
     display: inline-block;
     transition: filter 0.3s ease;
-    &:hover {
-      filter: brightness(0) saturate(100%) invert(36%) sepia(73%) saturate(845%) hue-rotate(188deg) brightness(98%) contrast(98%);
-    }
-  `
+  `,
 }));
 
 export const McpLogo: React.FC<McpLogoProps> = ({
@@ -24,26 +17,28 @@ export const McpLogo: React.FC<McpLogoProps> = ({
   className
 }) => {
   const { styles } = useStyles();
-  // Get current theme from settings store
-  const theme = useSettingStore((state) => state.settings['app.theme']);
-
-  // Choose logo based on theme
-  const currentLogo = theme === 'dark' ? mcpLogoDark : mcpLogoLight;
 
   return (
     <div className={styles.logoWrapper}>
-      <img
-        src={currentLogo}
-        alt="MCP Logo"
+      <svg 
+        width={size} 
+        height={size} 
+        viewBox="0 0 180 180" 
+        fill="none" 
+        stroke="currentColor"
         className={className}
-        style={{
-          width: size,
-          height: size,
-          objectFit: 'contain',
-          userSelect: 'none',
-          pointerEvents: 'none'
-        }}
-      />
+      >
+        <g clipPath="url(#clip0_19_13)">
+          <path d="M18 84.8528L85.8822 16.9706C95.2548 7.59798 110.451 7.59798 119.823 16.9706V16.9706C129.196 26.3431 129.196 41.5391 119.823 50.9117L68.5581 102.177" strokeWidth="12" strokeLinecap="round"/>
+          <path d="M69.2652 101.47L119.823 50.9117C129.196 41.5391 144.392 41.5391 153.765 50.9117L154.118 51.2652C163.491 60.6378 163.491 75.8338 154.118 85.2063L92.7248 146.6C89.6006 149.724 89.6006 154.789 92.7248 157.913L105.331 170.52" strokeWidth="12" strokeLinecap="round"/>
+          <path d="M102.853 33.9411L52.6482 84.1457C43.2756 93.5183 43.2756 108.714 52.6482 118.087V118.087C62.0208 127.459 77.2167 127.459 86.5893 118.087L136.794 67.8822" strokeWidth="12" strokeLinecap="round"/>
+        </g>
+        <defs>
+          <clipPath id="clip0_19_13">
+            <rect width="180" height="180" fill="white"/>
+          </clipPath>
+        </defs>
+      </svg>
     </div>
-  )
+  );
 }; 
