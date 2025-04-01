@@ -24,6 +24,9 @@ COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/server ./
 COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/resource ./resource/
 COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/config.docker.yaml ./
 
+# TODO: 临时方案，持久化目录
+COPY --from=0 /go/src/github.com/YFGaia/gaia-x/apps/admin/server/data/ ./data/
+
 # 挂载目录：如果使用了sqlite数据库，容器命令示例：docker run -d -v /宿主机路径/gva.db:/go/src/github.com/YFGaia/gaia-x/apps/admin/server/gva.db -p 8888:8888 --name gva-server-v1 gva-server:1.0
 # VOLUME ["/go/src/github.com/YFGaia/gaia-x/apps/admin/server"]
 
