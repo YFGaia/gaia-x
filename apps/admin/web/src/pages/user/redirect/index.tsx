@@ -1,8 +1,7 @@
 import { useIntl, history } from '@umijs/max';
-import { Card, Typography, Button, Space } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Card, Typography, Button } from 'antd';
+import React from 'react';
 import { useModel } from '@umijs/max';
-import { PageContainer } from '@ant-design/pro-components';
 import useStyles from './style.style';
 
 const { Title, Text, Paragraph } = Typography;
@@ -50,7 +49,7 @@ const RedirectPage: React.FC = () => {
     console.log('token', token);
     
     // 返回到个人设置页
-    // history.push('/account/settings');
+    history.push('/account/settings');
   };
 
   return (
