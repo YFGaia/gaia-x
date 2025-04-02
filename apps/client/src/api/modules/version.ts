@@ -11,5 +11,5 @@ export interface AppVersion {
 
 export const VersionApi = {
   getVersion: async (version: string): Promise<ApiResponse<AppVersion>> =>
-    request.get('/v1/version/getVersionInfo', { params: { version } }),
+    request.get('/gaia-x/v1/version/getVersionInfo', { params: { version } }),
 };

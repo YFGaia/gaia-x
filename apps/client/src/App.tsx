@@ -128,10 +128,9 @@ const AppGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       useSettingStore.getState().initialize();
       useMcpToolStore.getState().initialize();
       await useUserStore.getState().initialize();
-      // TODO: 有bug，暂时找不到原因，先注释掉
-      // if (await VersionService.checkUpdate(false)) {
-      //   setUpdate();
-      // }
+      if (await VersionService.checkUpdate(false)) {
+        setUpdate();
+      }
       setLoading(false);
     };
     init();

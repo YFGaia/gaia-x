@@ -8,8 +8,7 @@ const About = () => {
   // 版本号
   const [version, setVersion] = useState<string>('');
   const handleCheckUpdate = async () => {
-    // TODO: 有bug，暂时找不到原因，先注释掉
-    // await VersionService.checkUpdate(true);
+    await VersionService.checkUpdate(true);
   };
 
   useEffect(() => {
