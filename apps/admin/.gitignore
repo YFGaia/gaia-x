@@ -49,3 +49,6 @@ gva_web/
 
 # 忽略持久化目录
 server/data/
+
+# 忽略server本地配置文件
+server/config.yaml
