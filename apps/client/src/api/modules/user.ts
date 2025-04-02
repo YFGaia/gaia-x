@@ -44,7 +44,7 @@ export const UserApi = {
     });
   },
   uploadInfo: async (data: any): Promise<ApiResponse<void>> => {
-    return request.post('/v1/usage-report/createUsageReport', {
+    return request.post('/gaia-x/v1/usage-report/createUsageReport', {
       report_data: JSON.stringify(data),
     });
   }

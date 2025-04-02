@@ -9,6 +9,7 @@ func bizModel() error {
 	db := global.GVA_DB
 	err := db.AutoMigrate(
 		gaia_x.Version{},
+		gaia_x.UsageReportExtend{},
 	)
 	if err != nil {
 		return err
