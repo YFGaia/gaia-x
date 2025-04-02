@@ -19,6 +19,7 @@ request.interceptors.request.use(
     const token = useUserStore.getState().userInfo.token;
     if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
+      config.headers['x-token'] = `${token}`;
     }
     // 添加 token 等逻辑
     return config;
