@@ -55,17 +55,16 @@ const Login: React.FC<{ className?: string }> = ({ className }) => {
 
   async function getUserInfo(token: string): Promise<boolean> {
     try {
-      // TODO：临时注释掉，先改成直接从cookie中获取token
-      // const response = await UserApi.getUserInfo(token);
-      // if (response.code !== 0 || !response.data) {
-      //   setLoading(false);
-      //   console.error('获取用户信息失败:', response.message);
-      //   return false;
-      // }
-      // const { user_id, name, jwt_token } = response.data;
+      const response = await UserApi.getUserInfo(token);
+      if (response.code !== 0 || !response.data) {
+        setLoading(false);
+        console.error('获取用户信息失败:', response.message);
+        return false;
+      }
+      const userInfoRes = response.data;
       const userInfo = {
-        id: "1",
-        username: "管理员",
+        id: userInfoRes.userInfo.ID.toString(),
+        username: userInfoRes.userInfo.nickName,
         token: token,
       };
       console.log(userInfo);

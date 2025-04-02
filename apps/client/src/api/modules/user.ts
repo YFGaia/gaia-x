@@ -1,19 +1,45 @@
 import request from "../request";
 import { ApiResponse } from "../types";
 
+export interface Authority {
+  CreatedAt: string;
+  UpdatedAt: string;
+  DeletedAt: string | null;
+  authorityId: number;
+  authorityName: string;
+  parentId: number;
+  dataAuthorityId: number | null;
+  children: any | null;
+  menus: any | null;
+  defaultRouter: string;
+}
+
 export interface UserInfo {
-  user_id: string;
-  username: string;
-  name: string;
+  ID: number;
+  CreatedAt: string;
+  UpdatedAt: string;
+  uuid: string;
+  userName: string;
+  nickName: string;
+  headerImg: string;
+  authorityId: number;
+  authority: Authority;
+  authorities: Authority[];
+  phone: string;
   email: string;
-  jwt_token: string;
+  enable: number;
+  originSetting: any | null;
+}
+
+export interface UserInfoResponse {
+  userInfo: UserInfo;
 }
 
 export const UserApi = {
-  getUserInfo: async (code: string): Promise<ApiResponse<UserInfo>> => {
-    return request.get('/v1/user/getUserInfo', {
+  getUserInfo: async (token: string): Promise<ApiResponse<UserInfoResponse>> => {
+    return request.get('/user/getUserInfo', {
       headers: {
-        'Authorization': `${code}`,
+        'x-token': `${token}`,
       },
     });
   },
