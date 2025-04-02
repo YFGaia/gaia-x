@@ -37,6 +37,8 @@ export interface McpFunctionTool {
 interface McpToolStore {
   servers: Map<string, MCPServer>;
   getServer: (serverId: string) => MCPServer | null;
+  selectedServer?: string;
+  setSelectedServer: (serverId?: string) => void;
   workingDir: string;
   tools: McpFunctionTool[];
   installTool: (packageName: string, serverId: string) => Promise<boolean>;
@@ -48,9 +50,14 @@ export const useMcpToolStore = create<
   McpToolStore & {
     initialize: () => Promise<void>;
   }
->((_, get) => ({
-  servers: new Map(),
+>((set, get) => ({
   workingDir: '',
+  servers: new Map(),
+  selectedServer: undefined,
+  setSelectedServer: (serverId?: string) => {
+    set({ selectedServer: serverId });
+    console.log('selectedServer', serverId);
+  },
   initialize: async () => {
     // 清空现有数据
     get().servers.clear();
@@ -159,7 +166,7 @@ export const useMcpToolStore = create<
     
     // 等待所有工具加载完成
     await Promise.all(toolLoadPromises);
-    console.log('所有MCP工具加载完成');
+    console.log('所有MCP工具加载完成', get().tools);
   },
   getServer: (serverId: string) => {
     return get().servers.get(serverId) || null;

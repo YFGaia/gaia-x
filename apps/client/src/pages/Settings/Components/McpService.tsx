@@ -10,7 +10,7 @@ const { Title, Paragraph, Text } = Typography;
 type CommandType = 'default' | 'uvx' | 'npx' | 'sse';
 
 const McpService: React.FC = () => {
-  const { installTool, servers, initialize } = useMcpToolStore();
+  const { installTool, servers } = useMcpToolStore();
   const initSchedule = useScheduleStore((state) => state.getSchedule('initialize-runtimes'));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [packageName, setPackageName] = useState('');
@@ -21,9 +21,9 @@ const McpService: React.FC = () => {
   const [serverList, setServerList] = useState<Array<{id: string, config: any, tools: any[]}>>([]);
 
   // 组件初始化时加载MCP服务
-  useEffect(() => {
-    initialize();
-  }, []);
+  // useEffect(() => {
+  //   initialize();
+  // }, []);
   
   // 加载服务器列表
   useEffect(() => {

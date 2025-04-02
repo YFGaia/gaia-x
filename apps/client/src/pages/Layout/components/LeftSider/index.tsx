@@ -1,5 +1,5 @@
 import ChatMenu from "@/pages/Chat/components/ChatMenu";
-import PluginsMenu from "@/pages/Plugins/components/Menu";
+import McpMenu from "@/pages/Plugins/components/Menu";
 import { SettingsRouter } from "@/pages/Settings/Components/SettingView";
 import { Tabs, TabsProps } from "antd";
 import { createStyles } from "antd-style";
@@ -61,13 +61,13 @@ const LeftSider: React.FC = () => {
     {
       key: 'mcp',
       label: <TabLabel icon={<McpLogo size={18} />} />,
-      children: <div></div>
+      children: <McpMenu />
     },
-    {
-      key: 'plugin',
-      label: <TabLabel icon={<VscExtensions fontSize={16}/>} />,
-      children: <PluginsMenu />
-    },
+    // {
+    //   key: 'plugin',
+    //   label: <TabLabel icon={<VscExtensions fontSize={16}/>} />,
+    //   children: <PluginsMenu />
+    // },
     {
       key: 'settings',
       label: <TabLabel icon={<VscSettingsGear fontSize={16}/>} />,
