@@ -9,6 +9,7 @@ import { createStyles } from 'antd-style';
 import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+import Cookies from 'js-cookie';
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -113,6 +114,32 @@ const LoginMessage: React.FC<{
   );
 };
 
+// 检查用户是否已登录
+const checkIsLoggedIn = (): boolean => {
+  // 从 cookie 中获取 x-token
+  const getCookie = (name: string) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return undefined;
+  };
+  
+  // 检查 cookie 中是否有 x-token
+  const tokenInCookie = getCookie('x-token');
+  
+  // 检查 localStorage 中是否有 token
+  const tokenInStorage = localStorage.getItem('token');
+  
+  return !!tokenInCookie || !!tokenInStorage;
+};
+
+// 处理自动重定向
+const handleRedirect = () => {
+  const urlParams = new URL(window.location.href).searchParams;
+  const redirectPath = urlParams.get('redirect') || '/';
+  window.location.href = redirectPath;
+};
+
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
@@ -126,7 +153,7 @@ const Login: React.FC = () => {
     needInit: false,
     loading: true,
   });
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
   const intl = useIntl();
 
@@ -170,23 +197,18 @@ const Login: React.FC = () => {
     }
   };
 
-  // 组件加载时获取验证码和检查初始化状态
+  // 组件加载时获取验证码和检查初始化状态，并检查是否已登录
   useEffect(() => {
+    // 检查用户是否已登录，已登录则直接跳转
+    if (checkIsLoggedIn()) {
+      message.success('您已登录，正在跳转...');
+      handleRedirect();
+      return;
+    }
+    
     fetchCaptcha();
     checkInit();
   }, []);
-
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
-    }
-  };
 
   const handleSubmit = async (values: API.LoginParams) => {
     try {
@@ -207,7 +229,19 @@ const Login: React.FC = () => {
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+        
+        // 设置token到localStorage
+        if (result.data?.token) {
+          localStorage.setItem('token', result.data.token);
+          Cookies.set('x-token', result.data.token);
+        }
+        
+        flushSync(() => {
+          setInitialState((s) => ({
+            ...s,
+            currentUser: result.data?.user,
+          }));
+        });
         const urlParams = new URL(window.location.href).searchParams;
         window.location.href = urlParams.get('redirect') || '/';
         return;

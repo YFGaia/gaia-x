@@ -1,6 +1,7 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
+import { history } from '@umijs/max';
 
 // 错误处理方案： 错误类型
 enum ErrorShowType {
@@ -18,6 +19,15 @@ interface ResponseStructure {
   errorMessage?: string;
   showType?: ErrorShowType;
 }
+
+// 清除token的函数
+const clearTokens = () => {
+  // 清除localStorage中的token
+  localStorage.removeItem('token');
+  
+  // 清除cookie中的x-token
+  document.cookie = 'x-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+};
 
 /**
  * @name 错误处理
@@ -74,6 +84,12 @@ export const errorConfig: RequestConfig = {
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
         if (error.response.status === 401) {
           message.error('请先登录或登录已过期，请重新登录');
+          // 清除token
+          clearTokens();
+          // 重定向到登录页
+          if (window.location.pathname !== '/user/login') {
+            history.replace('/user/login');
+          }
         } else {
           message.error(`Response status:${error.response.status}`);
         }
