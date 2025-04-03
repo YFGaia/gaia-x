@@ -5,9 +5,13 @@ import api "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 type RouterGroup struct {
 	ChatRouter
 	RSARouter
+	AgentDataRouter
+	AgentRouter
 }
 
 var (
-	ChatApi = api.ApiGroupApp.AiApiGroup.ChatApi
-	RSAApi  = api.ApiGroupApp.AiApiGroup.RSAApi
+	ChatApi      = api.ApiGroupApp.AiApiGroup.ChatApi
+	RSAApi       = api.ApiGroupApp.AiApiGroup.RSAApi
+	AgentDataApi = api.ApiGroupApp.AiApiGroup.AgentDataApi
+	AgentApi     = api.ApiGroupApp.AiApiGroup.AgentApi
 )

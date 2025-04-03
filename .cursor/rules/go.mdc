@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+go禁止生成模拟测试代码, 要求真实, 除非我再次要求

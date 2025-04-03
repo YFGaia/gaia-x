@@ -17,8 +17,10 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 
 	aiRouter := router.RouterGroupApp.Ai
 	{
-		aiRouter.InitChatRouter(privateGroup, publicGroup) // AI路由
-		aiRouter.InitRSARouter(privateGroup, publicGroup)  // RSA加密路由
+		aiRouter.InitChatRouter(privateGroup, publicGroup)  // AI路由
+		aiRouter.InitRSARouter(privateGroup, publicGroup)   // RSA加密路由
+		aiRouter.InitAgentDataRouter(privateGroup, publicGroup) // 智能体数据路由，公共访问
+		aiRouter.InitAgentRouter(privateGroup, publicGroup) // 智能体路由
 	}
 
 	gaiaXRouter := router.RouterGroupApp.GaiaX

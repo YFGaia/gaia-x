@@ -21,6 +21,11 @@ func (s *ChatService) CreateChatCompletion(req einox.ChatRequest, writer io.Writ
 	if provider == "" {
 		provider = global.GVA_CONFIG.AI.Provider
 	}
+	//当等于azure_openai时转换为azure
+	if provider == "azure_openai" {
+		provider = "azure"
+	}
+	req.Provider = provider
 
 	// 如果是流式响应且writer不为nil
 	if req.Stream && writer != nil {
