@@ -5,7 +5,7 @@ interface McpLogoProps {
   className?: string;
 }
 
-const useStyles = createStyles(({ css, token }) => ({
+const useStyles = createStyles(({ css }) => ({
   logoWrapper: css`
     display: inline-block;
     transition: filter 0.3s ease;

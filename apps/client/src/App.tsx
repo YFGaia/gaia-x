@@ -135,7 +135,7 @@ const AppGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     };
     init();
     const cleanShowSettings = window.ipcRenderer.on(SettingChannel.SHOW_SETTINGS, () => {
-      setView('setting');
+      setView('settings');
     });
 
     const cleanShowChatWindow = window.ipcRenderer.on(

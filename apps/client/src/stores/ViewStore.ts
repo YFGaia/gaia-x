@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ViewType = 'chat' | 'setting' | 'extension' | 'mcp';
+export type ViewType = 'chat' | 'settings' | 'extension' | 'mcp';
 
 interface ViewStore {
   currentView: ViewType;
