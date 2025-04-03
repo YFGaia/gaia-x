@@ -15,7 +15,7 @@ volumes:
   
 services:
   web:
-    image: gaia-x-admin-web:0.0.1
+    image: ccr.ccs.tencentyun.com/yfgaia/gaia-x-admin-web:0.0.1
     container_name: gva-web
     restart: always
     ports:
@@ -28,7 +28,7 @@ services:
         ipv4_address: 177.7.0.11
 
   server:
-    image: gaia-x-admin-server:0.0.1
+    image: ccr.ccs.tencentyun.com/yfgaia/gaia-x-admin-server:0.0.1
     container_name: gva-server
     restart: always
     ports:
@@ -46,19 +46,18 @@ services:
         ipv4_address: 177.7.0.12
 
   mysql:
-    image: mysql:8.0.21       # 如果您是 arm64 架构：如 MacOS 的 M1，请修改镜像为 image: mysql/mysql-server:8.0.21
+    image: ccr.ccs.tencentyun.com/yfgaia/mysql:8.0.21
     container_name: gva-mysql
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci #设置utf8字符集
     restart: always
     ports:
       - "13306:3306"  # host物理直接映射端口为13306
     environment:
-      #MYSQL_ROOT_PASSWORD: 'Aa@6447985' # root管理员用户密码
-      MYSQL_DATABASE: 'qmPlus' # 初始化启动时要创建的数据库的名称
-      MYSQL_USER: 'gva'
-      MYSQL_PASSWORD: 'Aa@6447985'
+      MYSQL_DATABASE: 'gaiax' # 初始化启动时要创建的数据库的名称
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'gaia123456'
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "gva", "-pAa@6447985"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-gaia123456"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -69,7 +68,7 @@ services:
         ipv4_address: 177.7.0.13
 
   redis:
-    image: redis:6.0.6
+    image: ccr.ccs.tencentyun.com/yfgaia/redis:6.0.6
     container_name: gva-redis # 容器名
     restart: always
     ports:

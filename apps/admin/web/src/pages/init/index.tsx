@@ -71,11 +71,11 @@ const InitPage: React.FC = () => {
             onFinish={handleInitDB}
             initialValues={{
               dbtype: 'mysql',
-              host: '127.0.0.1',
+              host: 'db',
               port: '3306',
               username: 'root',
-              password: '',
-              dbname: 'gaia_admin',
+              password: 'gaia123456',
+              dbname: 'gaiax',
               autoCreate: true,
               adminPassword: '', // 管理员密码初始为空
             }}
