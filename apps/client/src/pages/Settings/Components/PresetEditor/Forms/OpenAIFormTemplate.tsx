@@ -113,14 +113,13 @@ export const OpenAIFormTemplate = () => {
     return serverData.tools.map((tool: McpServerTool) => ({
       label: (
         <div className="flex items-start py-1">
-          <div className="flex flex-col max-w-full">
+          <div className="flex flex-col" style={{ maxWidth: '400px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
             <span className="font-medium">{tool.name}</span>
-            <span className="text-xs text-gray-500 line-clamp-2">{tool.description}</span>
+            <span className="text-xs text-gray-500" style={{ whiteSpace: 'pre-wrap' }}>{tool.description}</span>
           </div>
         </div>
       ),
       value: tool.name,
-      // 添加工具的完整信息，用于自定义渲染标签
       tool
     }));
   };
@@ -220,8 +219,8 @@ export const OpenAIFormTemplate = () => {
                     return tagRender({...props, tool: toolInfo});
                   }}
                   listItemHeight={60}
-                  listHeight={250}
-                  dropdownStyle={{ minWidth: '300px', zIndex: 1100 }}
+                  listHeight={400}
+                  dropdownStyle={{ minWidth: '500px', maxWidth: '800px', zIndex: 1100 }}
                   popupMatchSelectWidth={false}
                   getPopupContainer={(triggerNode) => document.body}
                 />

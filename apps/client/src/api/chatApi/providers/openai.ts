@@ -91,7 +91,7 @@ export class OpenAIChatAPI extends ChatAPI {
               };
             }
             // Check if this is a completion message
-            if (response.choices?.[0]?.finish_reason === 'tool_calls') {
+            if (response.choices?.[0]?.finish_reason === 'tool_calls' || response.choices?.[0]?.finish_reason === 'tool_use') {
               console.info('Received completion message with finish_reason: tool_calls');
               console.info(msg.data);
               return {
@@ -139,7 +139,8 @@ export class OpenAIChatAPI extends ChatAPI {
         msg.items.forEach((item) => {
           switch (item.type) {
             case 'message':
-              if (item.content) {
+              //TODO 有些ai是先发内容，在调用工具，这里做一下适配，后续有个message数据结构
+              if (item.content && !msg.items.some(item => item.type === 'callTools')) { 
                 formattedMessages.push({
                   role: 'assistant',
                   content: item.content,
