@@ -1,5 +1,5 @@
 import ChatMenu from "@/pages/Chat/components/ChatMenu";
-import PluginsMenu from "@/pages/Plugins/components/Menu";
+import McpMenu from "@/pages/Plugins/components/Menu";
 import { SettingsRouter } from "@/pages/Settings/Components/SettingView";
 import { Tabs, TabsProps } from "antd";
 import { createStyles } from "antd-style";
@@ -50,7 +50,7 @@ const TabLabel = ({ icon }: { icon: React.ReactNode }) => {
 
 const LeftSider: React.FC = () => {
   const { styles } = useStyle();
-  const { setView } = useViewStore();
+  const { currentView, setView } = useViewStore();
 
   const tabItems: TabsProps['items'] = [
     {
@@ -61,13 +61,13 @@ const LeftSider: React.FC = () => {
     {
       key: 'mcp',
       label: <TabLabel icon={<McpLogo size={18} />} />,
-      children: <div></div>
+      children: <McpMenu />
     },
-    {
-      key: 'plugin',
-      label: <TabLabel icon={<VscExtensions fontSize={16}/>} />,
-      children: <PluginsMenu />
-    },
+    // {
+    //   key: 'plugin',
+    //   label: <TabLabel icon={<VscExtensions fontSize={16}/>} />,
+    //   children: <PluginsMenu />
+    // },
     {
       key: 'settings',
       label: <TabLabel icon={<VscSettingsGear fontSize={16}/>} />,
@@ -80,7 +80,7 @@ const LeftSider: React.FC = () => {
     if (key === 'chat') {
       setView('chat');
     } else if (key === 'settings') {
-      setView('setting');
+      setView('settings');
     } else if (key === 'mcp') {
       setView('mcp');
     } else if (key === 'plugin') {
@@ -91,7 +91,14 @@ const LeftSider: React.FC = () => {
   // 由于扩展功能还没上线，所以先隐藏
   return (
     <div className={styles.leftContent}>
-      <Tabs items={tabItems} className={styles.tabs} more={moreProps} onChange={handleChange} />
+      <Tabs 
+        items={tabItems} 
+        // defaultActiveKey={currentView}
+        className={styles.tabs} 
+        more={moreProps} 
+        onChange={handleChange} 
+        activeKey={currentView}
+      />
     </div>
   )
 }
