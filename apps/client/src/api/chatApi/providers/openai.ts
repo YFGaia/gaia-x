@@ -31,8 +31,12 @@ export class OpenAIChatAPI extends ChatAPI {
       frequency_penalty: options.preset.frequency_penalty ?? 0,
       top_p: options.preset.top_p ?? 1,
       max_tokens: options.preset.max_tokens ?? 2000,
-      tools: options.tools,
     };
+    
+    if (options?.tools && options.tools.length > 0) {
+      requestPayload.tools = options.tools;
+      requestPayload.tool_choice = 'auto';
+    }
     if (this.systemPrompt) {
       requestPayload.messages.unshift({
         role: 'system',

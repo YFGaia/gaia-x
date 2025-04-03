@@ -116,13 +116,10 @@ export function stream(
             
             // Handle specific error cases
             if (res.status === 401) {
-              window.ipcRenderer.send('global-notification', 'Gaia-X 登录已过期', "请在 设置 - 个人信息 退出重新登录", false);
               const error = new Error("Unauthorized - Please check your API credentials");
               error.message = errorText;
               options.onError?.(counter++, error);
               controller.abort();
-              const id = useUserStore.getState().userInfo.id;
-              WindowService.logout(id);
               return;
             }
 
