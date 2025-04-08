@@ -31,7 +31,7 @@ const MODEL_MAPPING: Record<string, Array<{ id: string, name: string }>> = {
 };
 
 // 从环境变量获取 API 地址
-const GAIA_AI_API_URL = import.meta.env.VITE_GAIA_AI_API_URL_BASE_URL || 'http://gaia-x.cn/api/v1/chat/completion';
+const GAIA_AI_API_URL = import.meta.env.VITE_BASE_URL + import.meta.env.VITE_GAIA_AI_API_URL_BASE_URL || 'http://gaia-x.cn/api/v1/chat/completion';
 
 /** 按需加载 GaiaAI 表单模板，配置密钥，模型参数，提示词等 */
 export const GaiaAIFormTemplate = () => {

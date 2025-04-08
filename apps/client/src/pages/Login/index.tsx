@@ -46,7 +46,7 @@ const Login: React.FC<{ className?: string }> = ({ className }) => {
 
   const login = async () => {
     setLoading(true);
-    window.open(import.meta.env.VITE_SSO_LOGIN_URL, '_blank');
+    window.open(import.meta.env.VITE_BASE_URL + import.meta.env.VITE_SSO_LOGIN_URL, '_blank');
   };
 
   const closeWindow = () => {

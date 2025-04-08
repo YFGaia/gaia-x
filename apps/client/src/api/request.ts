@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import { WindowService } from '@/services/WindowService';
 
 const request: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL + import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   withCredentials: true,
   headers: {
