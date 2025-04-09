@@ -188,7 +188,7 @@ export default class ToolbarWindow {
           // 启用沙盒模式，防止跨域等安全问题
           sandbox: true,
           // 启用开发者工具
-          devTools: globalSettings.inDebug,
+          devTools: false,
           // 设置默认字符编码
           defaultEncoding: 'utf8',
           // 启用 WebGL 支持

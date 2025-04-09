@@ -168,6 +168,18 @@ const removeDir = async (dir) => {
 const cleanNodeModules = async (options = {}) => {
   console.log('🧹 开始清理node_modules目录...');
   
+  // 删除根目录的 pnpm-lock.yaml
+  const lockFile = path.join(process.cwd(), 'pnpm-lock.yaml');
+  if (fs.existsSync(lockFile)) {
+    console.log('🗑️ 删除 pnpm-lock.yaml...');
+    try {
+      fs.unlinkSync(lockFile);
+      console.log('✅ pnpm-lock.yaml 删除成功');
+    } catch (error) {
+      console.error('❌ 删除 pnpm-lock.yaml 失败:', error.message);
+    }
+  }
+  
   // 获取所有workspace路径
   const workspacePaths = await getWorkspacePaths();
   let cleaned = 0;

@@ -1,22 +1,17 @@
 import { getChatAPI } from '@/api/chatApi/chat';
-import { ChatAPI, ChatMessage, ChatToolOptions, ToolCall } from '@/api/chatApi/types';
-import { useUserStore } from '@/stores/UserStore';
-import { formatErrorMessage, Message, MessageItem, ThoughtChainItemExpand } from '@/types/chat';
-import { McpServer, Preset, StreamDelta } from '@/types/xKey/types';
-import { generateUniqueId } from '@/utils/common';
-import { useCallback, useRef, useState } from 'react';
+import { ChatAPI, ChatToolOptions, ToolCall } from '@/api/chatApi/types';
+import { useAppStateStore } from '@/stores/AppStateStore';
 import { useMcpToolStore } from '@/stores/McpToolStore';
 import { useRenderConfirmStore } from '@/stores/RenderConfirmStore';
-import { ThoughtChainItem } from '@ant-design/x';
+import { useUserStore } from '@/stores/UserStore';
+import { toolCall } from '@/tools/toolsManager';
+import { formatErrorMessage, Message, MessageItem, ThoughtChainItemExpand } from '@/types/chat';
+import { ToolCallParams } from '@/types/core';
 import { MCPToolChannel } from '@/types/ipc/mcpTool';
 import { SessionChannel } from '@/types/ipc/session';
-import { useAppStateStore } from '@/stores/AppStateStore';
-import { toolCall } from '@/tools/toolsManager';
-import { ToolCallParams } from '@/types/core';
-
-const getTools = (servers: McpServer[]) => {
-  const tools = [];
-}
+import { McpServer, Preset, StreamDelta } from '@/types/xKey/types';
+import { generateUniqueId } from '@/utils/common';
+import { useCallback, useRef } from 'react';
 
 export interface RequestOptions {
   message: Message;
@@ -89,7 +84,7 @@ export const useOnChat = (options?: ChatToolOptions) => {
   };
 
   // 处理单个工具调用
-  const handleToolCall = useCallback(async (call: any, thought?: ThoughtChainItem) => {
+  const handleToolCall = useCallback(async (call: any, thought?: ThoughtChainItemExpand) => {
     try {
       const args = JSON.parse(call.function.arguments || '{}');
 
@@ -355,22 +350,17 @@ export const useOnChat = (options?: ChatToolOptions) => {
         onUpdate(aiMessage);
         console.log('onToolStart', thought);
         //进行确定
-        // const confirm = await waitResult({
-        //   conversationId: conversationId,
-        //   chatId: message.id,
-        //   item: {
-        //     id: aiMessageItemId,
-        //     type: 'markdown',
-        //     result: '',
-        //     title: '确定要使用' + call.function.name + '工具吗？',
-        //     content: '调用参数 \n ```json \n' + JSON.stringify(args, null, 2) + '\n ```',
-        //   },
-        // });
-        const confirm = {
+        const confirm = await waitResult({
+          conversationId: conversationId,
+          chatId: aiMessage.id,
           item: {
-            result: 'ok',
+            id: aiMessageItemId,
+            type: 'markdown',
+            result: '',
+            title: '确定要使用' + call.function.name + '工具吗？',
+            content: '调用参数 \n ```json \n' + JSON.stringify(args, null, 2) + '\n ```',
           },
-        };
+        });
         if (confirm.item.result === 'ok') {
           aiMessage.items[aiMessage.items.length - 1].content.content = '工具执行中....';
           onUpdate(aiMessage);

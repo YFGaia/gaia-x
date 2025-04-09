@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { Form, Input, Select, InputNumber, Button, Space, Typography } from 'antd';
 import { Preset, UserInput } from '@/types/xKey/types';
+import { useChatContext } from '@/contexts/ChatContext';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -8,7 +9,6 @@ const { Title } = Typography;
 // 表单引用类型定义
 export interface ChatFormRef {
   getValues: () => Promise<Record<string, any>>;
-  submit: () => void;
 }
 
 interface ChatFormProps {
@@ -70,6 +70,7 @@ const ChatForm = forwardRef<ChatFormRef, ChatFormProps>(({ preset, onSubmit, inp
   const prevScrollStateRef = useRef(false);
   // 添加调试计数器，帮助排查问题
   const checkScrollCountRef = useRef(0);
+  const { setFormData } = useChatContext();
   
   // 使用 useMemo 计算表单字段，避免不必要的重新计算
   const formFields = useMemo(() => transformFields(preset), [preset]);
@@ -99,19 +100,9 @@ const ChatForm = forwardRef<ChatFormRef, ChatFormProps>(({ preset, onSubmit, inp
   }, []);
 
   // 处理表单值变化，检测是否是入口变量变化
-  const handleValuesChange = useCallback((changedValues: Record<string, any>, allValues: Record<string, any>) => {
-    if (!preset?.inputFormEntryVariable || !onEntryVariableChange) return;
-    
-    // 检查是否是入口变量发生变化
-    const entryVariable = preset.inputFormEntryVariable;
-    if (entryVariable in changedValues) {
-      const newValue = changedValues[entryVariable];
-      // 确保传递字符串值
-      onEntryVariableChange(typeof newValue === 'string' ? newValue : String(newValue || ''));
-      
-      console.log(`入口变量 ${entryVariable} 变化为:`, newValue);
-    }
-  }, [preset?.inputFormEntryVariable, onEntryVariableChange]);
+  const handleValuesChange = useCallback((_: any, allValues: Record<string, any>) => {
+    setFormData(allValues);
+  }, [setFormData]);
 
   // 使用 useLayoutEffect 检测是否需要滚动
   useLayoutEffect(() => {
@@ -158,34 +149,12 @@ const ChatForm = forwardRef<ChatFormRef, ChatFormProps>(({ preset, onSubmit, inp
     };
   }, [maxHeight]); // 从依赖数组中移除needScroll，避免循环更新
 
-  // 使用 useCallback 包装 getValues 和 submit 方法，确保它们的引用稳定性
-  const getValues = useCallback(async () => {
-    try {
-      if (hasValidForm) {
-        return await form.validateFields();
-      }
-      return {};
-    } catch (errorInfo) {
-      console.error('表单验证失败:', errorInfo);
-      return {};
+  // 暴露方法给父组件
+  useImperativeHandle(ref, () => ({
+    getValues: async () => {
+      return form.getFieldsValue();
     }
-  }, [form, hasValidForm]);
-
-  const submitForm = useCallback(() => {
-    if (hasValidForm) {
-      form.submit();
-    }
-  }, [form, hasValidForm]);
-
-  // 使用 useImperativeHandle 暴露方法给父组件，添加依赖数组
-  useImperativeHandle(
-    ref, 
-    () => ({
-      getValues,
-      submit: submitForm
-    }),
-    [getValues, submitForm]
-  );
+  }));
 
   // 计算表单初始值 - 使用 useMemo 避免不必要的重新计算
   const initialValues = useMemo(() => {

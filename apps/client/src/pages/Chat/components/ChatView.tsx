@@ -1,35 +1,24 @@
-import { RenderConfirmView } from '@/components/RenderConfirm';
+import { useChatContext } from '@/contexts/ChatContext';
 import { useConversation } from '@/hooks/Conversion';
 import { RequestOptions, useOnChat } from '@/hooks/OnChat';
 import { useAppStateStore } from '@/stores/AppStateStore';
 import { useConversationStore } from '@/stores/ConversationStore';
 import { useRenderConfirmStore } from '@/stores/RenderConfirmStore';
 import { useViewStore } from '@/stores/ViewStore';
-import { isChatError, Message, MessageItem, ThoughtChainItemExpand } from '@/types/chat';
-import { ChatChannel, SettingChannel, ToolbarChannel } from '@/types/ipc/xKey';
+import { Message, MessageItem, ThoughtChainItemExpand } from '@/types/chat';
+import { ChatChannel } from '@/types/ipc/xKey';
 import { Preset } from '@/types/xKey/types';
-import { SwapOutlined, UserOutlined } from '@ant-design/icons';
-import { Bubble, BubbleProps, useXAgent, useXChat } from '@ant-design/x';
+import { SwapOutlined } from '@ant-design/icons';
+import { Bubble, useXAgent, useXChat } from '@ant-design/x';
 import { THOUGHT_CHAIN_ITEM_STATUS } from '@ant-design/x/es/thought-chain/Item';
-import {
-  Button,
-  Collapse,
-  CollapseProps,
-  GetProp,
-  Select,
-  Typography,
-  message as messageAntd,
-} from 'antd';
+import { Button, GetProp, message as messageAntd } from 'antd';
 import { createStyles } from 'antd-style';
-import markdownit from 'markdown-it';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import ChatPlaceholder from './ChatPlaceholder';
+import { ChatFormRef } from './ChatForm';
 import ChatPrompt from './ChatPrompt';
-import ChatSender from './ChatSender';
-import ToolThoughtChain from './ToolThoughtChain';
-import ContainerUpExpander from '@/components/ContainerUpExpander';
-import ChatForm, { ChatFormRef } from './ChatForm';
+import ChatSender, { ChatSenderRef } from './ChatSender';
+import MessageList from './MessageList';
 
 const useStyle = createStyles(({ token, css }) => {
   return {
@@ -157,182 +146,69 @@ interface AgentCallbacks {
   onError: (error: Error) => void;
 }
 
-// 渲染markdown
-const md = markdownit({ html: true, breaks: true });
-const renderMarkdown: BubbleProps['messageRender'] = (content) => {
-  if (isChatError(content)) {
-    return <Typography.Text type="danger">{content}</Typography.Text>;
-  }
-  return (
-    <Typography>
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: used in demo */}
-      <div dangerouslySetInnerHTML={{ __html: md.render(content) }} />
-    </Typography>
-  );
-};
-
-// 设置头像
-const fooAvatar: React.CSSProperties = {
-  color: '#f56a00',
-  backgroundColor: '#fde3cf',
-  marginTop: '7px',
-};
-
-const barAvatar: React.CSSProperties = {
-  color: '#fff',
-  backgroundColor: '#87d068',
-  marginTop: '7px',
-};
-
-const thinkingItems = (reasoning: string): CollapseProps['items'] => {
-  return [
-    {
-      key: '1',
-      label: '推理过程',
-      children: (
-        <div className="flex flex-row relative">
-          {/* 左侧竖线 */}
-          <div className="w-[2px] bg-gray-300 rounded-full absolute left-0 top-0 bottom-0 min-h-full"></div>
-          {/* 推理内容 */}
-          <pre className="pl-4 flex-1 text-wrap font-sans p-0 m-0">{reasoning}</pre>
-        </div>
-      ),
-    },
-  ];
-};
-
 const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
   const { activeKey, changeSource, setActiveKey } = useConversationStore();
   const { setView } = useViewStore();
   const { styles } = useStyle();
-  const [selectPresetDisabled, setSelectPresetDisabled] = useState(false);
-  const { addConversation, addMessage, updateMessage, getMessages, getConversation } =
-    useConversation();
+  const { addMessage, updateMessage } = useConversation();
   const { setMode, mode, rightPanel } = useAppStateStore();
-  const [ifShowForm, setIfShowForm] = useState(true);
-  const [presetId, setPresetId] = useState<string | null>(null);
-  const [preset, setPreset] = useState<Preset | null>(null);
-  const inputTextRef = useRef<string>('');
-  const presetIdRef = useRef<string | null>(null);
-  const presetsRef = useRef<Preset[]>([]);
-  const ifShowFormRef = useRef<boolean>(true);
   const confirms = useRenderConfirmStore(
     useShallow((state) => state.getConversationConfirms(activeKey))
   );
-  const chatFormRef = useRef<ChatFormRef>(null);
+  const chatSenderRef = useRef<ChatSenderRef>(null);
+
+  const {
+    messages,
+    messageThoughts,
+    addMessage: addChatMessage,
+    setMessageThoughts,
+    updateMessage: updateChatMessage,
+    currentPreset,
+    addConversation,
+    messageSuccess,
+    getFormData,
+  } = useChatContext();
 
   const changeModeNormal = async () => {
     setMode('normal');
   };
 
-  const [messageThoughts, setMessageThoughts] = useState<Record<string, ThoughtChainItemExpand>>(
-    {}
-  );
-  /** 输入框内容 */
-  const [content, setContent] = React.useState('');
-  /** 消息列表 */
-  const [messages, setMessages] = useState<Array<Message>>([]);
   /** 使用 onChat 发送消息 */
   const { onChat, setHistoryMessages, clearChatAPI, abortChat } = useOnChat();
 
   const messagesRef = useRef<Array<Message>>([]);
 
-  const findPreset = (id: string) => {
-    console.log('presetsRef.current', presetsRef.current);
-    return presetsRef.current.find((preset) => preset.id === id) as Preset;
-  };
+  const currentPresetRef = useRef(currentPreset);
 
-  const changeChatSenderContent = (content: string) => {
-    setContent(content);
-    inputTextRef.current = content;
-  };
+  useEffect(() => {
+    currentPresetRef.current = currentPreset;
+  }, [currentPreset]);
 
   useEffect(() => {
     if (changeSource === 'inner') {
       return;
     }
-
     console.log('params', params);
     if (params.mode) {
       setMode(params.mode);
     }
-
-    getMessages(activeKey).then((res) => {
-      if (res?.messages?.length > 0) {
-        setSelectPresetDisabled(true);
-      } else {
-        setSelectPresetDisabled(false);
-      }
-      console.log('res', res);
-      setMessages(res.messages);
-      setMessageThoughts(res.thoughts);
-      clearChatAPI();
-      messagesRef.current = res.messages;
-      console.log('设置历史消息：', res.messages.slice(-10));
-    });
-
-    getConversation(activeKey).then((res) => {
-      console.log('getConversation res', res);
-      window.ipcRenderer.invoke(SettingChannel.GET_PRESETS).then((presets) => {
-        presetsRef.current = presets.presets;
-        console.log('presets', presets);
-        if (params.presetId) {
-          console.log('res', res);
-          setPresetId(params.presetId);
-          setPreset(findPreset(params.presetId));
-          presetIdRef.current = params.presetId;
-        } else if (res?.presetId) {
-          setPresetId(res.presetId);
-          setPreset(findPreset(res.presetId));
-          presetIdRef.current = res.presetId;
-        } else {
-          setPresetId(presets.presets[0]?.id || null);
-          setPreset(findPreset(presets.presets[0]?.id || null));
-          presetIdRef.current = presets.presets[0]?.id || null;
-        }
-        console.log('presetId', presetId);
-      });
-    });
   }, [activeKey, changeSource]);
 
   useEffect(() => {
-    // setMessageThoughts({}); // 清空思维链
-    // setMessages([]);
-    // azureOpenAI.clearHistory?.();
     const cleanNewChat = window.ipcRenderer.on(
       ChatChannel.NEW_CHAT,
       (_: Electron.IpcRendererEvent, preset: Preset, conversationId: string) => {
         console.log('NEW_CHAT', preset, conversationId);
-        setActiveKey(conversationId);
         setView('chat', { chatId: conversationId, presetId: preset.id });
-        setPresetId(preset.id);
-        setPreset(preset);
-        setIfShowForm(true);
-        ifShowFormRef.current = true;
-        presetIdRef.current = preset.id;
         setMode('mini');
-        // 重置消息历史
-        setMessageThoughts({}); // 清空思维链
-        setMessages([]); // 清空消息
-        messagesRef.current = [];
-        clearChatAPI(); // 清空历史消息
-      }
-    );
-
-    const cleanTextSelected = window.ipcRenderer.on(
-      ToolbarChannel.TEXT_SELECTED,
-      (_: Electron.IpcRendererEvent, { text }: { text: string }) => {
-        setContent(text?.trim());
-        inputTextRef.current = text?.trim();
       }
     );
 
     return () => {
       console.log('清理新聊天');
       cleanNewChat();
-      cleanTextSelected();
     };
-  }, [preset, presetId, mode]);
+  }, [mode]);
 
   const onToolStart = (name: string, args: any, messageItemId?: string) => {
     const thought: ThoughtChainItemExpand = {
@@ -342,7 +218,7 @@ const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
       requestContent: args,
       responseContent: '等待响应...',
       isError: false,
-      status: 'pending',
+      status: THOUGHT_CHAIN_ITEM_STATUS.PENDING,
       extra: '',
       iconStr: THOUGHT_CHAIN_ITEM_STATUS.PENDING,
     };
@@ -385,43 +261,20 @@ const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
       { message }: AgentRequestOptions,
       { onSuccess, onUpdate, onError }: AgentCallbacks
     ): Promise<void> => {
-      setSelectPresetDisabled(true);
-      console.log('presetId', presetIdRef.current);
-      await addConversation(message || '新会话', presetIdRef.current || '', 'inner');
+      await addConversation(message || '新会话', currentPresetRef.current?.id || '', 'inner');
 
       if (!message) return;
 
-      const userMessage = await addMessage(message, 'user');
-      
-      const tempMessage: Message = {
-        id: userMessage.id,
-        role: 'user',
-        status: 'success',
-        items: [
-          {
-            id: userMessage.id,
-            content: message,
-            type: 'message',
-          },
-        ],
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        tempMessage
-      ]);
+      const userMessage = await addChatMessage(message, 'user');
 
       // 添加 AI 响应消息（初始状态为 loading）
 
-      const aiMessage = await addMessage('', 'ai');
-      console.log('aiMessage', aiMessage);
-      aiMessage.status = 'loading';
-
-      setMessages((prev) => [...prev, aiMessage]);
+      const aiMessage = await addChatMessage('', 'ai');
 
       // 包装回调函数以更新 AI 消息
       const wrappedOnUpdate = (message: Message) => {
         onUpdate(message.items[message.items.length - 1].content);
+        updateChatMessage(message.id, message)
       };
 
       const wrappedOnError = (error: Error) => {
@@ -435,26 +288,21 @@ const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
         onError(error);
       };
 
-      const wrappedOnSuccess = (massageId: string, msgItem: MessageItem) => {
-        setMessages((prev) =>
-          prev.map((msg) => {
-            console.log('wrappedOnSuccess', msg, massageId, msgItem);
-            if (msg.id === massageId) {
-              msg.status = 'success';
-            }
-            return msg;
-          })
-        );
-        updateMessage(aiMessage);
-        messagesRef.current.push(tempMessage, aiMessage);
+      const wrappedOnSuccess = (messageId: string, msgItem: MessageItem) => {
+        messageSuccess(messageId, aiMessage);
+        messagesRef.current.push(userMessage, aiMessage);
         onSuccess(msgItem?.content || '');
       };
 
-      const presetCurrent = findPreset(presetIdRef.current || '');
+      if (!currentPresetRef.current?.id) {
+        messageAntd.error('当前没有预设');
+        return;
+      }
+
       const messageParams: RequestOptions = {
         message: userMessage,
         aiMessage,
-        preset: presetCurrent,
+        preset: currentPresetRef.current,
         conversationId: useConversationStore.getState().activeKey,
         onSuccess: wrappedOnSuccess,
         onUpdate: wrappedOnUpdate,
@@ -463,26 +311,23 @@ const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
         onToolEnd,
         variables: {},
       };
-      if (presetCurrent?.userInputForm && presetCurrent?.userInputForm.length > 0) {
-        if (ifShowFormRef.current) {
-          const values = await chatFormRef.current?.getValues();
-          messageParams.variables = values || {};
-        } else {
-          presetCurrent.userInputForm.map((item) => {
-            Object.values(item).forEach((item2) => {
-              messageParams.variables[item2.variable] = item2.default;
-            });
-          });
-          presetCurrent?.inputFormEntryVariable &&
-            (messageParams.variables[presetCurrent.inputFormEntryVariable] = inputTextRef.current);
+
+      if (currentPresetRef.current?.userInputForm && currentPresetRef.current?.userInputForm.length > 0) {
+        // 直接从 context 获取表单数据
+        const formValues = getFormData();
+        messageParams.variables = formValues;
+
+        // 如果有输入框变量，添加到 variables 中
+        if (currentPresetRef.current?.inputFormEntryVariable) {
+          messageParams.variables[currentPresetRef.current.inputFormEntryVariable] = 
+            chatSenderRef.current?.getContent() || '';
         }
       }
-      setHistoryMessages(messagesRef.current.slice(-10));
 
+      setHistoryMessages(messagesRef.current.slice(-10));
       await onChat(messageParams);
-      // await azureOpenAI.sendMessage(messageParams);
     },
-    [ messagesRef, presetId, addConversation, addMessage, updateMessage, setMessages, onChat, preset]
+    [getFormData, messagesRef, addConversation, addMessage, onChat]
   );
 
   const [agent] = useXAgent({
@@ -495,177 +340,48 @@ const ChatDetail: React.FC<{ params: Record<string, any> }> = ({ params }) => {
     parser: (message: string) => message,
   });
 
-  // 更新 agent
-  useEffect(() => {
-    if (agent) {
-      setMessages([]); // 清空消息
-    }
-  }, [agent, setMessages]);
-
-  const items: GetProp<typeof Bubble.List, 'items'> = messages.map(
-    ({ id, items, role, status }) => {
-      return {
-        key: id,
-        status,
-        role,
-        variant: 'filled',
-        avatar:
-          role === 'user'
-            ? { icon: <UserOutlined />, style: fooAvatar }
-            : { icon: <UserOutlined />, style: barAvatar },
-        content:
-          role === 'user' ? (
-            items[0].content
-          ) : (
-            <div className="flex flex-col" key={id}>
-              {items.map((item) => {
-                if (item.type === 'thought') {
-                  return <ToolThoughtChain thought={messageThoughts[item.id]} key={item.id} />;
-                } else if (item.type === 'message') {
-                  return (
-                    <Bubble
-                      content={item.content}
-                      key={item.id}
-                      messageRender={renderMarkdown}
-                      variant="borderless"
-                      // typing={{ step: 20, interval: 100 }}
-                    />
-                  );
-                } else if (item.type === 'thinking') {
-                  return (
-                    <Collapse
-                      key={`thinking-${item.id}`}
-                      ghost
-                      items={thinkingItems(item.content)}
-                      accordion
-                      defaultActiveKey={['1']}
-                    />
-                  );
-                } else if (rightPanel !== 'open' || mode !== 'normal') {
-                  const confirmItems = confirms
-                    .filter((confirm) => confirm.chatId === id)
-                    .map((confirm) => (
-                      <div key={confirm.item.id}>
-                        <RenderConfirmView {...confirm} />
-                      </div>
-                    ));
-
-                  // 如果没有确认项，返回null而不是空数组
-                  return confirmItems.length > 0 ? (
-                    <React.Fragment key={`confirms-${id}-${item.id}`}>
-                      {confirmItems}
-                    </React.Fragment>
-                  ) : null;
-                }
-                return null;
-              })}
-            </div>
-          ),
-      };
-    }
+  // 处理提交
+  const handleSubmit = useCallback(
+    (nextContent: string) => {
+      if (!nextContent) return;
+      onRequest(nextContent);
+    },
+    [onRequest]
   );
 
-  const changePreset = (presetId: string) => {
-    setPresetId(presetId);
-    presetIdRef.current = presetId;
-    const tempPreset = findPreset(presetId);
-    setPreset(tempPreset);
-    if (tempPreset?.userInputForm && tempPreset?.userInputForm.length > 0) {
-      setIfShowForm(true);
-      ifShowFormRef.current = true;
-      inputTextRef.current = '';
-    }
-  };
-
-  const onSubmit = (nextContent: string) => {
-    if (!nextContent) return;
-    console.log('您点击了提交');
-    setIfShowForm(false);
-    ifShowFormRef.current = false;
-    onRequest(nextContent);
-    setContent('');
-  };
-
   return (
-    <div className={styles.layout}>
-      <div className={styles.chat}>
-        <div>
-          {presetsRef.current.length > 0 && (
-            <Select
-              style={{ minWidth: 200 }}
-              disabled={selectPresetDisabled}
-              size="small"
-              value={presetId}
-              onChange={changePreset}
-              options={presetsRef.current.map((preset) => ({
-                label: preset.title,
-                value: preset.id,
-              }))}
-            />
+      <div className={styles.layout}>
+        <div className={styles.chat}>
+          <MessageList
+            messages={messages}
+            messageThoughts={messageThoughts}
+            roles={roles}
+            mode={mode}
+            onRequest={onRequest}
+          />
+          {mode === 'remote' && (
+            <Button
+              icon={<SwapOutlined />}
+              onClick={changeModeNormal}
+              title="切换回正常模式"
+              className="mb-4"
+            >
+              切换回正常模式
+            </Button>
           )}
+          {mode === 'normal' && <ChatPrompt onRequest={onRequest} />}
+          <ChatSender
+            ref={chatSenderRef}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              console.log('您点击了取消');
+              abortChat();
+            }}
+            loading={agent.isRequesting()}
+            className={styles.sender}
+          />
         </div>
-        <Bubble.List
-          items={
-            items.length > 0
-              ? items
-              : mode === 'normal'
-              ? [
-                  {
-                    key: 'placeholder',
-                    content: <ChatPlaceholder onRequest={onRequest} />,
-                    variant: 'outlined',
-                  },
-                ]
-              : []
-          }
-          roles={roles}
-          className={styles.messages}
-        />
-        {mode === 'remote' && (
-          <Button
-            icon={<SwapOutlined />}
-            onClick={changeModeNormal}
-            title="切换回正常模式"
-            className="mb-4"
-          >
-            切换回正常模式
-          </Button>
-        )}
-        {preset?.userInputForm && preset?.userInputForm.length > 0 && (
-          <ContainerUpExpander
-            title="查看表单"
-            buttonWidth={110}
-            buttonAlign="left"
-            defaultExpanded={true}
-            expanded={ifShowForm}
-            onExpandChange={(expanded) => setIfShowForm(expanded)}
-          >
-            <ChatForm
-              preset={preset}
-              inputText={inputTextRef.current}
-              ref={chatFormRef}
-              onEntryVariableChange={(value) => {
-                inputTextRef.current = value;
-                setContent(value);
-              }}
-            />
-          </ContainerUpExpander>
-        )}
-        {mode === 'normal' && <ChatPrompt onRequest={onRequest} />}
-        {/* 🌟 输入框 */}
-        <ChatSender
-          value={content}
-          onSubmit={onSubmit}
-          onChange={changeChatSenderContent}
-          onCancel={() => {
-            console.log('您点击了取消');
-            abortChat();
-          }}
-          loading={agent.isRequesting()}
-          className={styles.sender}
-        />
       </div>
-    </div>
   );
 };
 

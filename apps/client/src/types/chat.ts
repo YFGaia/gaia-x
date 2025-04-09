@@ -1,5 +1,4 @@
 import { ToolCall } from '@/api/chatApi/types';
-import { RenderConfirm } from '@/stores/RenderConfirmStore';
 import { ThoughtChainItem } from '@ant-design/x';
 import { THOUGHT_CHAIN_ITEM_STATUS } from '@ant-design/x/es/thought-chain/Item';
 
@@ -32,7 +31,10 @@ export interface MessageItem {
   tool_call_id?: string;
 }
 
-export interface ThoughtChainItemExpand extends ThoughtChainItem {
+export type ThoughtChainItemExpandStatus = THOUGHT_CHAIN_ITEM_STATUS | 'running';
+
+export interface ThoughtChainItemExpand extends Omit<ThoughtChainItem, 'status'> {
+  status: ThoughtChainItemExpandStatus;
   requestContent: string | any;
   responseContent: string | any;
   isError: boolean;

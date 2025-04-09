@@ -8,6 +8,7 @@ import { ChatChannel, SettingChannel } from '@/types/ipc/xKey';
 import { useSettingStore } from '@/stores/SettingStore';
 import { Preset } from '@/types/xKey/types';
 import { useAppStateStore } from '@/stores/AppStateStore';
+import { ChatProvider } from '@/contexts/ChatContext';
 
 const MainContent: React.FC = () => {
   const { currentView, viewParams, setView } = useViewStore();
@@ -34,7 +35,7 @@ const MainContent: React.FC = () => {
   }, [])
   return (
     <div className="mainContent h-full bg-white dark:bg-[#141414]">
-      {currentView === 'chat' && <ChatView params={viewParams} />}
+      {currentView === 'chat' && <ChatProvider><ChatView params={viewParams} /></ChatProvider>}
       {currentView === 'mcp' && <McpView />}
       {currentView === 'extension' && <ExtensionDetail />}
       {currentView === 'settings' && <SettingView />}

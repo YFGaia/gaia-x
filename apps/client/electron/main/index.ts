@@ -23,7 +23,7 @@ export const globalSettings = {
   forceUpdate: false,
   inDebug: false,
   userId: '',
-}
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,9 +45,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 if (isDev()) {
-  app.setAsDefaultProtocolClient(app.getName(), process.execPath, [
-    path.resolve(process.argv[1])
-  ]);
+  app.setAsDefaultProtocolClient(app.getName(), process.execPath, [path.resolve(process.argv[1])]);
 } else {
   app.setAsDefaultProtocolClient(app.getName());
 }
@@ -88,17 +86,16 @@ app.whenReady().then(async () => {
   if (url) {
     await handleProtocol(url);
   }
-  
+
   // 不再直接修改环境变量
   await setupModules();
-  
+
   // 初始化运行时环境
   // initializeRuntimes();
-  
+
   console.log('setupModules');
   LoginWindow.createWindow();
 });
-
 
 app.on('window-all-closed', () => {
   WindowManager.getInstance().closeAllWindows();

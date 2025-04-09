@@ -10,6 +10,7 @@ export interface RenderConfirm {
 interface RenderConfirmStore {
   confirms: RenderConfirm[];
   getConversationConfirms: (conversationId: string) => RenderConfirm[];
+  getMessageItemConfirm: (itemId: string) => RenderConfirm | undefined;
   addConfirm: (confirm: RenderConfirm) => void;
   clearConfirm: () => void;
   removeConfirm: (conversationId: string, chatId: string, itemId: string) => void;
@@ -21,6 +22,9 @@ export const useRenderConfirmStore = create<RenderConfirmStore>((set, get) => ({
   confirms: [],
   getConversationConfirms: (conversationId) => {
     return get().confirms.filter(item => item.conversationId === conversationId);
+  },
+  getMessageItemConfirm: (itemId) => {
+    return get().confirms.find(item => item.item.id === itemId);
   },
   addConfirm: (confirm: RenderConfirm) => {
     set((state) => ({
