@@ -123,6 +123,12 @@ export const errorConfig: RequestConfig = {
       if (data?.success === false) {
         message.error('请求失败！');
       }
+      
+      // 处理业务状态码不为0的情况，显示错误信息
+      if (data && typeof data.code === 'number' && data.code !== 0 && data.msg) {
+        message.error(data.msg);
+      }
+      
       return response;
     },
   ],
